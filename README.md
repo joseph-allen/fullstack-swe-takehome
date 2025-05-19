@@ -244,7 +244,7 @@ I had a play with the TableCheck colors using the recommended [pallette-generato
 
 #### Loading Component
 
-I decided to start with this as it's the simplest component, allowing me to get my bearings within my own project. I've not decided if this is for the "waiting" animation, or if this is for the loading state after the form is posted. I'm not sure that matters as it could serve both of those.
+I decided to start with this as it's the simplest component, allowing me to get my bearings within my own project. I've not decided if this is for the "waiting" animation, or if this is for the loading state after the form is posted. I'm not sure that matters as it could serve both of those. I decided to implement this as TDD, there's no data flying around yet and my expectations for this component are quite simple.
 
 I used Lordicon to make a custom animation here over a themed Circular Progress from from Material-UI. I think this animation is going to be watched a lot, and with a better tool I'd make some sort of transition between multiple well-styled icons but this will do for now. I chose APNG as it supports transparent backgrounds, has [96% support across browsers](https://caniuse.com/apng) (though I could have gone more legacy with a gif if needed.)
 
