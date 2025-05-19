@@ -1,29 +1,13 @@
 'use client'; // Ensure this is client-side rendering
-import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
-import { CacheProvider } from '@emotion/react';
-import createCache from '@emotion/cache';
-import { Global, css } from '@emotion/react';
+import { Roboto } from 'next/font/google';
+import { ThemeProvider } from '@mui/material/styles';
+import { theme } from '@/theme';
+import CssBaseline from '@mui/material/CssBaseline';
+import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 
-// Create Emotion cache
-const cache = createCache({ key: 'next' });
-
-// Global styles
-const globalStyles = css`
-  body {
-    margin: 0;
-    font-family: sans-serif;
-    background-color: #fafafa;
-  }
-`;
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const roboto = Roboto({
+  variable: '--font-roboto',
   subsets: ['latin'],
 });
 
@@ -33,12 +17,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html>
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <CacheProvider value={cache}>
-          <Global styles={globalStyles} /> {/* Apply global styles */}
-          {children} {/* Render children components */}
-        </CacheProvider>
+    <html lang="en" className={roboto.variable}>
+      <body>
+        <AppRouterCacheProvider>
+          <ThemeProvider theme={theme}>
+            {/* Baseline for theme */}
+            <CssBaseline />
+            {children} Render children components
+          </ThemeProvider>
+        </AppRouterCacheProvider>
       </body>
     </html>
   );
