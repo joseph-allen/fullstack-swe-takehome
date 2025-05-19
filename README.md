@@ -238,8 +238,18 @@ Note: I spent a long time on setup here, I wanted to show the kind of project se
 
 #### Material UI
 
-I decided to start with this as it's the simplest component, allowing me to get my bearings within my own project. I've not decided if this is for the "waiting" animation, or if this is for the loading state after the form is posted. I'm not sure that matters as it could serve both of those.
-
 I've immediately realised I'd much rather have Material-UI, while I could write my own styles fully I think Material-UI adds an immediate boost that when devtime is a priority, such as a tech test, it's worthwhile. The SSR setup in Next is a lot more trivial than bare Emotion too. I figured out the Global style provider uses createContext, preventing SSR.
 
 I had a play with the TableCheck colors using the recommended [pallette-generator](https://m2.material.io/inline-tools/color/) and the [theme generator](https://zenoo.github.io/mui-theme-creator/). I thought theming would be a quick win here, but SSR adds complexity so I am going to come back around to that when I have a place for the theme toggle.
+
+#### Loading Component
+
+I decided to start with this as it's the simplest component, allowing me to get my bearings within my own project. I've not decided if this is for the "waiting" animation, or if this is for the loading state after the form is posted. I'm not sure that matters as it could serve both of those. I decided to implement this as TDD, there's no data flying around yet and my expectations for this component are quite simple.
+
+I used Lordicon to make a custom animation here over a themed Circular Progress from from Material-UI. I think this animation is going to be watched a lot, and with a better tool I'd make some sort of transition between multiple well-styled icons but this will do for now. I chose APNG as it supports transparent backgrounds, has [96% support across browsers](https://caniuse.com/apng) (though I could have gone more legacy with a gif if needed.)
+
+I added some loading ellipses after that are optional. I'm not sure this looks any better but figured it would make this component a little more interesting for you to review. So if you made it to this point please check out the following:
+
+- next-app/src/stories/LoadingComponent.stories.ts
+- next-app/src/components/LoadingComponent.tsx
+- next-app/\_\_tests\_\_/components/LoadingComponent.test.tsx
