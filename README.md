@@ -1,10 +1,11 @@
 # Remote Waitlist Manager
+
 Node Version - v22.15.0
 
-* [Project Board](https://github.com/users/joseph-allen/projects/2)
-* [Live URL](https://fullstack-swe-takehome.vercel.app/)
-* [API Endpoint](https://fullstack-swe-takehome.vercel.app/api/test)
-* [Storybook](https://6823193a638044cca3f86e60-dqlkgbwbev.chromatic.com/)
+- [Project Board](https://github.com/users/joseph-allen/projects/2)
+- [Live URL](https://fullstack-swe-takehome.vercel.app/)
+- [API Endpoint](https://fullstack-swe-takehome.vercel.app/api/test)
+- [Storybook](https://6823193a638044cca3f86e60-dqlkgbwbev.chromatic.com/)
 
 A full-stack application to manage restaurant waitlists, with real-time seating, queuing, and notifications for diners. Takehome task for TableCheck.
 
@@ -13,8 +14,8 @@ A full-stack application to manage restaurant waitlists, with real-time seating,
 1. [Setup](#setup)
 2. [Diary](#diary)
 
-
 # Setup
+
 ### Quick run with Docker
 
 ```
@@ -90,6 +91,7 @@ npx chromatic --project-token=chpt_b609d47135590e0
 ```
 
 # Diary
+
 1. [Initial thoughts](#initial-thoughts)
 2. [Project Setup](#project-setup)
 3. [Solution](#solution)
@@ -176,7 +178,9 @@ At this point I realize I've made a pretty mature outline of what should be a ba
 Starting Cypress from the inception of a project makes a lot more sense, it's a trivial and enjoyable experience to add. I've always been unsure as to when E2E tests should run, the last project I worked on, E2E tests took over 6 hours to run, and became a complete blocker of the pipeline. Because of this they ran it once overnight, which often meant morning rollbacks. My hunch, is that lots of tests accomadated for timing out or something strange because at the moment, it's quite quick. Github actions on push and pull request seem like a right level for now.
 
 ### Solution
+
 I think at this point, I have my stack setup with basic examples. A brief outline of my intended solution is as follows:
+
 1. Full-Stack Next.js - This is my solution to front-end and back-end with options for isomorphic SSR. API is largely self-documenting and won't require me to setup another project.
 2. MongoDB - Chosen for it's ease of setup with Docker.
 3. Server Sent Events - While Websockets might be ideal, I'm going to try for Server-Sent Events to push status updates to the client.
@@ -184,6 +188,7 @@ I think at this point, I have my stack setup with basic examples. A brief outlin
 5. Queue Processing - Backend responds to Server Sent Events by processing the queue as availibility arrives.
 
 In the interest of keeping things short, but open to refactoring I have a notion of "A resturant" and a notion of "Parties", where a party is described as follows:
+
 ```
 {
   _id: ObjectId(),
@@ -201,13 +206,15 @@ In the interest of keeping things short, but open to refactoring I have a notion
 I think the backend can be covered with a few GET and POST requests, with some filtering and maths happening somewhere on the backend or MongoDB itself.
 
 The Front-end can probably be reduced to:
-* Join Queue From - Show the current queue state if needed, shows estimated wait time, collects details from users.
-* Party Status - Maybe a version of this is availible even before you join the queue.
-* Queue Controls - Check In Button and Cancel Queue button
+
+- Join Queue From - Show the current queue state if needed, shows estimated wait time, collects details from users.
+- Party Status - Maybe a version of this is availible even before you join the queue.
+- Queue Controls - Check In Button and Cancel Queue button
 
 These are just initial thoughts, to be fleshed out on the Projects board.
 
 ### Design
+
 I'd expect to work from an existing design, so I think making my own wireframes is a good way to make sure I've covered the featues I expect.
 
 ![Wireframes](https://github.com/user-attachments/assets/1778aca3-3044-4200-9aae-0656680c50dd)
@@ -216,12 +223,23 @@ While we don't always get the chance to see a fully-designed app before we start
 ![Wireframes](https://github.com/user-attachments/assets/6400ab80-d769-4a55-a2ae-1e556d50d9f9)
 
 Outline:
-* Layout - Usually I'd use an app-level layout to add a header/footer and brand information and simple SEO details.
-* Container - Following a Container / Component layout, I can use this top-level container to handle a lot of the logic meaning components below could be entirely functional.
-* Status - A Component which renders the expected wait up, alerts status changes and current party details.
-* Form - We can keep the form data seperate, with the container controlling whether or not it renders.
-* Loading - Commonly forgotten Loading/success/warning states which could be considered outside of component logic.
+
+- Layout - Usually I'd use an app-level layout to add a header/footer and brand information and simple SEO details.
+- Container - Following a Container / Component layout, I can use this top-level container to handle a lot of the logic meaning components below could be entirely functional.
+- Status - A Component which renders the expected wait up, alerts status changes and current party details.
+- Form - We can keep the form data seperate, with the container controlling whether or not it renders.
+- Loading - Commonly forgotten Loading/success/warning states which could be considered outside of component logic.
 
 This can be implemented, regardless of the API development with some good unit tests.
 
-Note: I spent a long time on setup here,  I wanted to show the kind of project setup you can expect from me, and it's been a few months since I last thought about what stack I would start with. I think if I went through this again I'd probably have added Material UI and theming as a demo. I'd consider this all outside the scope of your initial task, but it's useful to me for the other take home tasks I am recieving anyway. I removed any TableCheck context and made a standalone [template repo](https://github.com/joseph-allen/next-mongo-template).
+Note: I spent a long time on setup here, I wanted to show the kind of project setup you can expect from me, and it's been a few months since I last thought about what stack I would start with. I think if I went through this again I'd probably have added Material UI and theming as a demo. I'd consider this all outside the scope of your initial task, but it's useful to me for the other take home tasks I am recieving anyway. I removed any TableCheck context and made a standalone [template repo](https://github.com/joseph-allen/next-mongo-template).
+
+### Features
+
+#### Material UI
+
+I decided to start with this as it's the simplest component, allowing me to get my bearings within my own project. I've not decided if this is for the "waiting" animation, or if this is for the loading state after the form is posted. I'm not sure that matters as it could serve both of those.
+
+I've immediately realised I'd much rather have Material-UI, while I could write my own styles fully I think Material-UI adds an immediate boost that when devtime is a priority, such as a tech test, it's worthwhile. The SSR setup in Next is a lot more trivial than bare Emotion too. I figured out the Global style provider uses createContext, preventing SSR.
+
+I had a play with the TableCheck colors using the recommended [pallette-generator](https://m2.material.io/inline-tools/color/) and the [theme generator](https://zenoo.github.io/mui-theme-creator/). I thought theming would be a quick win here, but SSR adds complexity so I am going to come back around to that when I have a place for the theme toggle.
