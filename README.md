@@ -223,3 +223,5 @@ Outline:
 * Loading - Commonly forgotten Loading/success/warning states which could be considered outside of component logic.
 
 This can be implemented, regardless of the API development with some good unit tests.
+
+Note: I spent a long time on setup here,  I wanted to show the kind of project setup you can expect from me, and it's been a few months since I last thought about what stack I would start with. I think if I went through this again I'd probably have added Material UI and theming as a demo. I'd consider this all outside the scope of your initial task, but it's useful to me for the other take home tasks I am recieving anyway. I removed any TableCheck context and made a standalone [template repo](https://github.com/joseph-allen/next-mongo-template).
