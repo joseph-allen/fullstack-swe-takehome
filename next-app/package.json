@@ -34,6 +34,7 @@
     "mongodb": "^6.16.0",
     "next": "15.3.2",
     "react": "^19.0.0",
+    "react-confetti-boom": "^1.1.2",
     "react-dom": "^19.0.0",
     "xstate": "^5.19.3"
   },

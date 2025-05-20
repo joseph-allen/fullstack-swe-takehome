@@ -1,6 +1,7 @@
 import React from 'react';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import Confetti from 'react-confetti-boom';
 type StatusComponentProps = {
   state: string;
   estimateInMinutes: number;
@@ -48,9 +49,17 @@ export const StatusComponent = ({
       )}
 
       {/* If ready to check in, prompt the user */}
-      {/* TODO: Trigger confetti? Get the users attention */}
       {state === 'ready to check in' && (
         <>
+          {/* TODO: Trigger confetti - This should be up in the container and xState dependent */}
+          <Confetti
+            particleCount={80}
+            effectCount={5}
+            colors={['#7935D2', '#292929']}
+            shapeSize={15}
+            spreadDeg={90}
+            y={0.8}
+          />
           {/* Show the user their table is ready */}
           <Typography variant="h3" component="p" sx={{ marginTop: 2 }}>
             {`Your table is ready, ${name}`}
