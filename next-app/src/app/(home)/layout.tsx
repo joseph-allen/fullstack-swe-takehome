@@ -23,17 +23,13 @@ export default function HomeLayout({
           maxWidth: '50vw',
           padding: 4,
           boxShadow: 3,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 4,
         }}
       >
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          {children}
-        </div>
+        {children}
       </Card>
     </Box>
   );
