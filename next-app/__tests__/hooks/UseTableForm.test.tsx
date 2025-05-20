@@ -38,4 +38,17 @@ describe('useTableForm hook', () => {
 
     expect(result.current.partySize).toBe(MAX_TABLE_SIZE);
   });
+
+  it('calls mock onSubmit function when submitted', () => {
+    const mockSubmit = jest.fn();
+    const { result } = renderHook(() => useTableForm(mockSubmit));
+
+    act(() => {
+      result.current.onSubmit({ name: 'Bob', partySize: 2 });
+    });
+
+    expect(mockSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'Bob', partySize: 2 })
+    );
+  });
 });

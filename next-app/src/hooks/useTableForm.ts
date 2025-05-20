@@ -8,7 +8,7 @@ export type TableFormValues = {
 };
 
 // default partySize is 1, assumed most common table size but could be inferred from previous bookings
-export function useTableForm() {
+export function useTableForm(customOnSubmit?: (data: TableFormValues) => void) {
   const {
     control,
     handleSubmit,
@@ -49,8 +49,13 @@ export function useTableForm() {
     setValue('partySize', Math.max(1, partySize - 1));
   };
 
+  // temporary support for a custom onSubmit
   const onSubmit = (data: TableFormValues) => {
-    console.log('Form submitted:', data);
+    if (customOnSubmit) {
+      customOnSubmit(data);
+    } else {
+      console.log('Form submitted:', data);
+    }
   };
 
   return {

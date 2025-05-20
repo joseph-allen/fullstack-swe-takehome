@@ -57,6 +57,9 @@ export const TableForm: React.FC = () => {
               </IconButton>
 
               <TextField
+                id="party-input"
+                data-testid="party-input"
+                aria-label="party-input"
                 type="number"
                 {...partySizeField}
                 error={!!partySizeError}
