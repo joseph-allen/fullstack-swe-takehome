@@ -7,7 +7,7 @@ export type TableFormValues = {
   partySize: number;
 };
 
-// default partySize is 2, assumed most common table size but could be inferred from previous bookings
+// default partySize is 1, assumed most common table size but could be inferred from previous bookings
 export function useTableForm() {
   const {
     control,
@@ -18,7 +18,7 @@ export function useTableForm() {
   } = useForm<TableFormValues>({
     defaultValues: {
       name: '',
-      partySize: 2,
+      partySize: 1,
     },
   });
 

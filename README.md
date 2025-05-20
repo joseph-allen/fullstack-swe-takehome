@@ -263,3 +263,20 @@ I added some loading ellipses after that are optional. I'm not sure this looks a
 Another simple component. My thinking here is that my Container can use an xState machine, and that state can be passed down to this component to change it's rendering. I could have done some clever nested checks to render parts as needed, but I felt since the state is controlled so well with xState that keeping to a single state check makes the component far more readable. Rendering could be done conditionally based on provided props too, if there is no estimated wait time are we at the front of the queue? If there is no party Id then we must be in the idle state. These would be clever choices, but the trade-off to readability felt obtuse.
 
 I'd saved it as a bonus, but again since the states are so obvious and front of queue is a celebration state I added confetti to celebrate and get the users attention if they were holding the screen open but didn't notice any changes. Confetti is TableCheck brand colors but I think I could add a simple CRM / resturant endpoint that we hit from the URL that could flavor our loading image and this confetti.
+
+#### Form Component
+
+That's the last of our simple components. We move on to our form. At this point I haven't stubbed out a loading and warning state, often forgotten in designs and later a frantically added feature when an innevitable waiting state is added to the real submit action.
+
+react-hook-forms is a lovely package that gives you handles all the validation and state issues that can come with handling multiple form inputs. Combined with this, Material-UI has beautiful googly inputs with built in error handling. The difficulty in this component is combining the functionality of both components.
+
+The name field is simple enough, we can assume it's non-empty for now. Some name inputs might set a minimum length higher than 1 but I've found that a western pattern. I have a friend with a two character last name, and a partner with a 20 character double-barelled last name. Not to mention character-based languages like Japanese where a single or two kanji name is a common and valid use-case.
+
+Number of diners requires some context from the resturant. I plan to stub out a CRM response for the sake of this demo, where details like largest table, resturant capacity etc can be pulled from. For now I will assume the most common diner type is a single diner, another feature that could be pre-processed and handed to the UI. My original hunch was to use different icons for different "personas":
+
+- Single diner - a meal icon, rather than anything isolating
+- Couple - a non-romantic icon of two diners.
+- Group - 3+ diners together, not implying children
+- Party - Something representative of a large group or crowd
+
+I struggled to find a consistent icon pack for this, with no in-house designer. I decided to instead simply render the number of diners visually, hoping that the number in the box and number of diners as icons is enough to display what this section means. The label "party size" feels out of place, but I think it's necessary. I've lazily added an animation as they pop in, and used animated icons to give this simple component a lot more character. I'd need a different set of icons for a dark mode, but already the icons I have been using can be re-colored within React using react-lottie. That's out of the scope of this tech task but something I'd rather do.

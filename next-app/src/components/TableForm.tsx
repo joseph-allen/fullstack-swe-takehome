@@ -25,7 +25,7 @@ export const TableForm: React.FC = () => {
   } = useTableForm();
 
   return (
-    <Paper elevation={3} sx={{ maxWidth: 400, mx: 'auto', p: 3 }}>
+    <Paper elevation={3} sx={{ width: 400, maxWidth: 400, mx: 'auto', p: 3 }}>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <Stack spacing={3}>
           <Typography variant="h5" textAlign="center">
@@ -45,8 +45,9 @@ export const TableForm: React.FC = () => {
               direction="row"
               spacing={2}
               alignItems="center"
-              justifyContent="center"
+              justifyContent="space-evenly"
             >
+              <Typography variant="h5">Party size:</Typography>
               <IconButton
                 onClick={decrement}
                 disabled={partySize <= 1}
@@ -73,16 +74,24 @@ export const TableForm: React.FC = () => {
             </Stack>
           </Box>
 
-          {/* Render image per customer, lets change the icon based on seats */}
-          {/* TODO: REPLACE */}
+          {/* Render image per customer */}
           <Box display="flex" flexWrap="wrap" gap={1} justifyContent="center">
             {Array.from({ length: partySize }, (_, i) => (
               <img
                 key={i}
-                src="/wine.svg"
+                src="/person.apng"
                 alt={`Icon ${i + 1}`}
-                width={32}
-                height={32}
+                width={64}
+                height={64}
+                style={{
+                  transformOrigin: 'bottom center',
+                  transform: 'scale(0)',
+                  transition: 'transform 300ms ease',
+                  animation: 'scaleUpTrigger 0s forwards',
+                }}
+                onLoad={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                }}
               />
             ))}
           </Box>

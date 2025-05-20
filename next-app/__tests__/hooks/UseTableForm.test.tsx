@@ -5,20 +5,20 @@ describe('useTableForm hook', () => {
   it('initializes with default values and allows increment/decrement within bounds', () => {
     const { result } = renderHook(() => useTableForm());
 
-    // default partySize is 2
-    expect(result.current.partySize).toBe(2);
+    // default partySize is 1
+    expect(result.current.partySize).toBe(1);
 
     // increment once
     act(() => {
       result.current.increment();
     });
-    expect(result.current.partySize).toBe(3);
+    expect(result.current.partySize).toBe(2);
 
     // decrement once
     act(() => {
       result.current.decrement();
     });
-    expect(result.current.partySize).toBe(2);
+    expect(result.current.partySize).toBe(1);
 
     // decrement below 1 should clamp to 1
     act(() => {
