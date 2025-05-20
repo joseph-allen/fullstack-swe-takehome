@@ -30,7 +30,6 @@ export const LoadingComponent = ({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        height: '100vh',
       }}
     >
       <Image
@@ -41,7 +40,7 @@ export const LoadingComponent = ({
         style={{ marginBottom: '10px' }}
         data-testid="loading-image"
       />
-      <Typography variant="h4" sx={{ marginTop: 2 }}>
+      <Typography variant="h4" component="span" sx={{ marginTop: 2 }}>
         {text}
         {withDots && (
           <span data-testid="loading-ellipsis">{'.'.repeat(dots)}</span>
