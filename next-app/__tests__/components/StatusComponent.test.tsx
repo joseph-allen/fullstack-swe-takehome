@@ -47,6 +47,8 @@ describe('Status', () => {
   });
 
   it('renders invitation if ready to check in', () => {
+    jest.mock('react-confetti-boom');
+
     render(
       <Status state="ready to check in" name="The Smiths" partyID={123} />
     );
