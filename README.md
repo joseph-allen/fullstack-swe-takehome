@@ -253,3 +253,13 @@ I added some loading ellipses after that are optional. I'm not sure this looks a
 - next-app/src/stories/LoadingComponent.stories.ts
 - next-app/src/components/LoadingComponent.tsx
 - next-app/\_\_tests\_\_/components/LoadingComponent.test.tsx
+
+#### Status Component
+
+- next-app/src/stories/StatusComponent.stories.ts
+- next-app/src/components/StatusComponent.tsx
+- next-app/\_\_tests\_\_/components/StatusComponent.test.tsx
+
+Another simple component. My thinking here is that my Container can use an xState machine, and that state can be passed down to this component to change it's rendering. I could have done some clever nested checks to render parts as needed, but I felt since the state is controlled so well with xState that keeping to a single state check makes the component far more readable. Rendering could be done conditionally based on provided props too, if there is no estimated wait time are we at the front of the queue? If there is no party Id then we must be in the idle state. These would be clever choices, but the trade-off to readability felt obtuse.
+
+I'd saved it as a bonus, but again since the states are so obvious and front of queue is a celebration state I added confetti to celebrate and get the users attention if they were holding the screen open but didn't notice any changes. Confetti is TableCheck brand colors but I think I could add a simple CRM / resturant endpoint that we hit from the URL that could flavor our loading image and this confetti.
