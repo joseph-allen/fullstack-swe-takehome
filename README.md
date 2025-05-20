@@ -220,7 +220,7 @@ I'd expect to work from an existing design, so I think making my own wireframes 
 ![Wireframes](https://github.com/user-attachments/assets/1778aca3-3044-4200-9aae-0656680c50dd)
 
 While we don't always get the chance to see a fully-designed app before we start development, this time we do so we can make a decision on our component structure before we start. I'm undecided as to whether we should pre-design components, or abstract them out as we justify uses for them. For the sake of simple tickets though, I will design the components first.
-![Wireframes](https://github.com/user-attachments/assets/6400ab80-d769-4a55-a2ae-1e556d50d9f9)
+![Wireframe-components](https://github.com/user-attachments/assets/6931713d-1b80-4513-994e-d59eaa2ce290)
 
 Outline:
 
