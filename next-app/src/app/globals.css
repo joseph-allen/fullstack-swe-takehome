@@ -1,5 +1,5 @@
 :root {
-  --background: #ffffff;
+  --background: #d3c3e6;
   --foreground: #171717;
 }
 
@@ -14,6 +14,11 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+html body {
+  background-color: #d3c3e6;
 }
 
 body {
