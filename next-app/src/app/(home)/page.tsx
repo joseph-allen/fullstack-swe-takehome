@@ -29,7 +29,7 @@ export default function HomePage() {
         <Typography variant="h5" component="p">
           Get in the queue?
         </Typography>
-        <Button variant="outlined">Join Queue</Button>
+        <Button variant="outlined">Join queue</Button>
       </div>
     </>
   );

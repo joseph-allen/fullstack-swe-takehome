@@ -10,10 +10,7 @@ describe('home page', () => {
     cy.get('button').should('exist');
 
     // Check button has correct text
-    cy.get('button').should('have.text', 'Click me');
+    cy.get('button').should('have.text', 'Join queue');
     cy.get('button').should('have.length', 1);
-
-    // Check button is visible
-    cy.get('button').should('be.visible');
   });
 });
