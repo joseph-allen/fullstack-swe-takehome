@@ -3,14 +3,18 @@ import Typography from '@mui/material/Typography';
 import StatusComponent from '@/components/StatusComponent';
 import Divider from '@mui/material/Divider';
 import Button from '@mui/material/Button';
+import TableForm from '@/components/TableForm';
 
 // content, form of the dashboard
+// states - idle, showForm, formSubmitted, inQueue, readyToCheckIn
 export default function HomePage() {
+  // temporary state switcher
+  const state = 'showForm';
   return (
     <>
       {/* top */}
       <div>
-        {/* idle state, as the new user joins */}
+        {/* status shown in all states, with form changing on state */}
         <StatusComponent state="idle" estimateInMinutes={45} />
       </div>
       <Divider flexItem />
@@ -26,10 +30,15 @@ export default function HomePage() {
         }}
       >
         {/* idle state, as the new user joins */}
-        <Typography variant="h5" component="p">
-          Get in the queue?
-        </Typography>
-        <Button variant="outlined">Join queue</Button>
+        {state == 'idle' && (
+          <>
+            <Typography variant="h5" component="p">
+              Get in the queue?
+            </Typography>
+            <Button variant="outlined">Join queue</Button>
+          </>
+        )}
+        {state == 'showForm' && <TableForm />}
       </div>
     </>
   );
