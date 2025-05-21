@@ -6,27 +6,31 @@ import {
   Typography,
   IconButton,
   Stack,
-  Paper,
+  Alert,
 } from '@mui/material';
+import Image from 'next/image';
 import { Add, Remove } from '@mui/icons-material';
 import { useTableForm, MAX_TABLE_SIZE } from '@/hooks/useTableForm';
+import { TableFormValues } from '@/types/tableForm';
 
-export const TableForm: React.FC = () => {
+export const TableForm: React.FC<{
+  onSubmit?: (data: TableFormValues) => void;
+}> = ({ onSubmit }) => {
   const {
     register,
     handleSubmit,
-    onSubmit,
+    onSubmit: internalSubmit,
     errors,
     increment,
     decrement,
     partySize,
     partySizeField,
     partySizeError,
-  } = useTableForm();
+  } = useTableForm(onSubmit);
 
   return (
-    <Paper elevation={3} sx={{ width: 400, maxWidth: 400, mx: 'auto', p: 3 }}>
-      <form onSubmit={handleSubmit(onSubmit)} noValidate>
+    <div style={{ width: 400, maxWidth: 400, padding: 3 }}>
+      <form onSubmit={handleSubmit(internalSubmit)} noValidate>
         <Stack spacing={3}>
           <Typography variant="h5" textAlign="center">
             Join the queue
@@ -77,10 +81,27 @@ export const TableForm: React.FC = () => {
             </Stack>
           </Box>
 
+          <Box minHeight="48px" textAlign="center">
+            {partySize >= MAX_TABLE_SIZE && (
+              <Alert severity="warning">
+                <Typography variant="body2">
+                  For parties larger than {MAX_TABLE_SIZE}, please speak to the
+                  staff.
+                </Typography>
+              </Alert>
+            )}
+          </Box>
+
           {/* Render image per customer */}
-          <Box display="flex" flexWrap="wrap" gap={1} justifyContent="center">
+          <Box
+            minHeight="128px"
+            display="flex"
+            flexWrap="wrap"
+            gap={1}
+            justifyContent="center"
+          >
             {Array.from({ length: partySize }, (_, i) => (
-              <img
+              <Image
                 key={i}
                 src="/person.apng"
                 alt={`Icon ${i + 1}`}
@@ -104,7 +125,7 @@ export const TableForm: React.FC = () => {
           </Button>
         </Stack>
       </form>
-    </Paper>
+    </div>
   );
 };
 

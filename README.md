@@ -280,3 +280,17 @@ Number of diners requires some context from the resturant. I plan to stub out a 
 - Party - Something representative of a large group or crowd
 
 I struggled to find a consistent icon pack for this, with no in-house designer. I decided to instead simply render the number of diners visually, hoping that the number in the box and number of diners as icons is enough to display what this section means. The label "party size" feels out of place, but I think it's necessary. I've lazily added an animation as they pop in, and used animated icons to give this simple component a lot more character. I'd need a different set of icons for a dark mode, but already the icons I have been using can be re-colored within React using react-lottie. That's out of the scope of this tech task but something I'd rather do.
+
+#### Layout and XState
+
+At this point I have all the components I need, but no way to walk through them or really test them, a down side of this approach. I took advantage of Next.js route groups, to render a layout for the home page, without generating a layout that would default apply to all pages. Then I could use the default page of that route group, as the home page itself.
+
+For now, this page is a app-level router, routing the user through parts of the flow in the same application. The app state itself, felt like a good oppurtunity to use XState as it made it very clear where I was in the queuing process. There are a few points a user could fall out of, or reset their step in the process as well so this gave a good an flexible way to do that.
+
+While writing the initial test Button component with an XState machine, I found a pattern where you write a Hook, to simplify access to your Machine, and this felt like it tidied up my home page.
+
+Again I feel like I could have used a lot of nested if statements throughout the about page, but I tried to stick to stepping through the states for easy debugging. Some bits of text and dev buttons felt like they didn't belong inside my components, but also didn't warrant their own components so I left these floating as helpers in the page itself.
+
+When I came to submit I realised my pre-commit hook didn't check for TS errors, which would later fail the build so I decided to take this time to tidy up some stray TS issues I'd seen in my editor. I extracted my first globally useful type up to a types folder too and realised I should probably have some sort of global style variables as I am picking and choosing colors and spacing to not get distracted. I made the site responsive with a single line change thanks to Material UI.
+
+I really enjoyed XState. I always felt Redux could be quite verbose, and requires you learn it's terminology to think of it the right way. Finite State Machines are about as simple as Computing gets, and was something I was already familiar with. There are some useful functions later, like the ability to invoke functions from calls that could come in handy with the queue processing.

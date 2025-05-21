@@ -11,6 +11,7 @@ const roboto = Roboto({
   subsets: ['latin'],
 });
 
+// Global Layout file, good for headers, footers, global data etc.
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -23,7 +24,13 @@ export default function RootLayout({
           <ThemeProvider theme={theme}>
             {/* Baseline for theme */}
             <CssBaseline />
-            {children} Render children components
+            {/* <div>
+              <p>Header</p>
+            </div> */}
+            {children}
+            {/* <div>
+              <p>Footer</p>
+            </div> */}
           </ThemeProvider>
         </AppRouterCacheProvider>
       </body>
