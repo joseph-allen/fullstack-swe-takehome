@@ -207,13 +207,15 @@ I think the backend can be covered with a few GET and POST requests, with some f
 
 The Front-end can probably be reduced to:
 
-- Join Queue From - Show the current queue state if needed, shows estimated wait time, collects details from users.
+- Join Queue Form - Show the current queue state if needed, shows estimated wait time, collects details from users.
 - Party Status - Maybe a version of this is availible even before you join the queue.
 - Queue Controls - Check In Button and Cancel Queue button
 
 These are just initial thoughts, to be fleshed out on the Projects board.
 
 ### Design
+
+### Front-End
 
 I'd expect to work from an existing design, so I think making my own wireframes is a good way to make sure I've covered the featues I expect.
 
@@ -233,6 +235,28 @@ Outline:
 This can be implemented, regardless of the API development with some good unit tests.
 
 Note: I spent a long time on setup here, I wanted to show the kind of project setup you can expect from me, and it's been a few months since I last thought about what stack I would start with. I think if I went through this again I'd probably have added Material UI and theming as a demo. I'd consider this all outside the scope of your initial task, but it's useful to me for the other take home tasks I am recieving anyway. I removed any TableCheck context and made a standalone [template repo](https://github.com/joseph-allen/next-mongo-template).
+
+### Back-End & DB
+
+At the start of this project I decided that, whatever state the backend is going to be, I will need the front-end made. As I reach the finish of my front-end components I've learnt a lot more about the context.
+
+I feel I'm at a splitting point between how I'd implement things in the real world, and what is required for this tech task. Features that would have made more sense in the real world, like tracking your queue position, estimating wait times and more are simply out of scope. It's harder than I thought to seperate from the context of the real world and I find myself returning to your prompt.
+
+While I was previously happy to use Next.js's backend, I realise now that something between my Next App and the MongoDB is required. Somewhere there needs to be logic that simulates the 3 second dining reuirement. This could be in a clever Queue structure, like mongodbq. This could also be a standalone Express app, solely responsible for simulation.
+
+Were this a real app, I would lean more heavily on the MongoDB, with the ability to store 1000s of resturants in the relevant collections. I'd also expect the resturants themselves to control the expiry of tables, meaning my backend would be less of a simulator and more of a broker. With the need for security for access to said database, I can't keep the MongoDB in the same Docker container, with exposed default username password combinations alongside the environment variables that would give full access. Again I am determining that to largely be out of scope.
+
+Finally there is the question of how notifications are handled. Polling is the simplest thing I can think of, which would work with this flow, for a single small resturant. The simulation requirement makes this difficult, where in the real-world I could expect end of service events from the resturants. I can go further with SMS notifications, WebSockets or Server-Sent Events, but considering the time spent on this I'm going to go simple.
+
+So the structure I am ending up with is as follows:
+
+- Next.js App, with API requests from said app, only to the backend, including polling.
+- A Backend - I've not decided if this will be Express + Node.js or a Flask app. This backend will handle the simulation of diners, and update rows in the database to determine seat availibility.
+- A MongoDB - collections representing the queue, resturant and parties can all fall here.
+
+When I say queue, I could be referring to a diner queue, or a queue in the waitlist too.
+
+TODO: diagram
 
 ### Features
 
