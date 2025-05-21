@@ -256,7 +256,46 @@ So the structure I am ending up with is as follows:
 
 When I say queue, I could be referring to a diner queue, or a queue in the waitlist too.
 
-TODO: diagram
+So the flow is as follows:
+
+1. User Arrives -> Tries to Sit. If they can't sit they are prompted to fill in the form.
+2. User joins waitlist -> POST /api/waitlist
+3. Backend runs a loop every few seconds, processing the queue.
+
+- check all seated parties
+- now - seatedAt >= partySize x 3s, mark as done, and increase availableSeats += partySize
+- While availableSeats allows - pop earliest waiting party and process.
+
+4. We assume customers are seated automatically and handled by the resturant, ending our flow.
+
+Mongo:
+Parties
+
+```
+{
+  id: String,
+  name: String,
+  size: Number,
+  status: "waiting" | "seated" | "done",
+  createdAt: Date,
+  seatedAt?: Date
+}
+```
+
+System
+
+```
+{
+  totalSeats: 10,
+  availableSeats: 6
+}
+```
+
+API Endpoints:
+
+- GET /api/seats - availible seats number
+- POST /api/waitlist - Add party to waitlist
+- GET /api/waitlist/:id - Check party status, polled every 10 seconds.
 
 ### Features
 
