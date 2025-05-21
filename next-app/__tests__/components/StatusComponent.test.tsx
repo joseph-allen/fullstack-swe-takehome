@@ -45,7 +45,14 @@ describe('Status', () => {
   });
 
   it('renders invitation if ready to check in', () => {
-    render(<Status state="readyToCheckIn" name="The Smiths" partyID={123} />);
+    render(
+      <Status
+        estimateInMinutes={45}
+        state="readyToCheckIn"
+        name="The Smiths"
+        partyID={123}
+      />
+    );
     expect(screen.getByText('Show this to the host, 123')).toBeInTheDocument();
     // Check that the queue text is not rendered
     expect(screen.queryByText('minute wait')).not.toBeInTheDocument();

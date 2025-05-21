@@ -7,6 +7,12 @@ import TableForm from '@/components/TableForm';
 import LoadingComponent from '@/components/LoadingComponent';
 
 import { useAppMachine } from '@/hooks/useAppMachine';
+type AppState =
+  | 'idle'
+  | 'showForm'
+  | 'formSubmitted'
+  | 'inQueue'
+  | 'readyToCheckIn';
 
 export default function HomePage() {
   const {
@@ -19,7 +25,7 @@ export default function HomePage() {
     reset,
   } = useAppMachine();
 
-  const current = currentState;
+  const current = currentState as AppState;
 
   return (
     <>
@@ -39,7 +45,7 @@ export default function HomePage() {
         <>
           <div>
             <StatusComponent
-              state={String(current)}
+              state={current}
               estimateInMinutes={45}
               name="The Smiths"
               partyID={123}

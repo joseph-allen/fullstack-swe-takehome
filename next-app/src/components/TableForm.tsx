@@ -11,6 +11,7 @@ import {
 import Image from 'next/image';
 import { Add, Remove } from '@mui/icons-material';
 import { useTableForm, MAX_TABLE_SIZE } from '@/hooks/useTableForm';
+import { TableFormValues } from '@/types/tableForm';
 
 export const TableForm: React.FC<{
   onSubmit?: (data: TableFormValues) => void;
@@ -28,7 +29,7 @@ export const TableForm: React.FC<{
   } = useTableForm(onSubmit);
 
   return (
-    <div elevation={3} style={{ width: 400, maxWidth: 400, mx: 'auto', p: 3 }}>
+    <div style={{ width: 400, maxWidth: 400, padding: 3 }}>
       <form onSubmit={handleSubmit(internalSubmit)} noValidate>
         <Stack spacing={3}>
           <Typography variant="h5" textAlign="center">
