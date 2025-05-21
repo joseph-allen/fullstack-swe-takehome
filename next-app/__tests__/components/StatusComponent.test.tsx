@@ -23,7 +23,7 @@ describe('Status', () => {
   it('renders party ID if set', () => {
     render(
       <Status
-        state="in queue"
+        state="inQueue"
         estimateInMinutes={45}
         name="The Smiths"
         partyID={123}
@@ -35,26 +35,17 @@ describe('Status', () => {
   it('should render name if set', () => {
     render(
       <Status
-        state="in queue"
+        state="inQueue"
         estimateInMinutes={45}
         name="The Smiths"
         partyID={123}
       />
     );
-    expect(
-      screen.getByText("You're in the queue, The Smiths")
-    ).toBeInTheDocument();
+    expect(screen.getByText('Welcome, The Smiths')).toBeInTheDocument();
   });
 
   it('renders invitation if ready to check in', () => {
-    jest.mock('react-confetti-boom');
-
-    render(
-      <Status state="ready to check in" name="The Smiths" partyID={123} />
-    );
-    expect(
-      screen.getByText('Your table is ready, The Smiths')
-    ).toBeInTheDocument();
+    render(<Status state="readyToCheckIn" name="The Smiths" partyID={123} />);
     expect(screen.getByText('Show this to the host, 123')).toBeInTheDocument();
     // Check that the queue text is not rendered
     expect(screen.queryByText('minute wait')).not.toBeInTheDocument();

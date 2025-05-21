@@ -12,22 +12,24 @@ import Image from 'next/image';
 import { Add, Remove } from '@mui/icons-material';
 import { useTableForm, MAX_TABLE_SIZE } from '@/hooks/useTableForm';
 
-export const TableForm: React.FC = () => {
+export const TableForm: React.FC<{
+  onSubmit?: (data: TableFormValues) => void;
+}> = ({ onSubmit }) => {
   const {
     register,
     handleSubmit,
-    onSubmit,
+    onSubmit: internalSubmit,
     errors,
     increment,
     decrement,
     partySize,
     partySizeField,
     partySizeError,
-  } = useTableForm();
+  } = useTableForm(onSubmit);
 
   return (
     <div elevation={3} style={{ width: 400, maxWidth: 400, mx: 'auto', p: 3 }}>
-      <form onSubmit={handleSubmit(onSubmit)} noValidate>
+      <form onSubmit={handleSubmit(internalSubmit)} noValidate>
         <Stack spacing={3}>
           <Typography variant="h5" textAlign="center">
             Join the queue

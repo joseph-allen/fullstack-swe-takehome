@@ -14,13 +14,14 @@ export default function HomeLayout({
         justifyContent: 'center',
         alignItems: 'center',
         height: '100vh',
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#e4d7f6',
       }}
     >
       <Card
         sx={{
           width: '100%',
-          maxWidth: '50vw',
+          maxWidth: { xs: '90vw', md: '50vw' },
+          minHeight: { xs: '50vh', md: '25vh' },
           padding: 4,
           boxShadow: 3,
           display: 'flex',
