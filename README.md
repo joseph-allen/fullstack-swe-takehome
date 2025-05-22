@@ -368,3 +368,11 @@ I really enjoyed XState. I always felt Redux could be quite verbose, and require
 #### UUID
 
 Persisting the user across refreshes can be done with a UUID. I did this first with local storage for simplicity. I think I need the expiring nature of a cookie, as a diner could come back a few hours later. Expiry should be shorter than the longest table wait. This could probably be safely limited to "service time" with an option to reset the queue provided to the user. The cookie can hold the UUID, which will be sent with all API requests, meaning I can trust the API requests to identify the user.
+
+#### Backend
+
+I've decided to get to a walking skeleton state as fast as possible. My front end needs to be able to get information all the way from the database. I could put things directly into the database from the front end, but since I will need the backend at the very least to simulate dinners it makes sense to proxy things through it.
+
+I've got a simple function that pings the DB every ten seconds, which will evenutally become the notification system. While this is greedy, it will let us update queue position quickly. This could be replaced with SSE or WebSockets later but I'm going to call that out of scope for this task.
+
+Docker compose let's me have a seperate docker container for each service, and a Next.js proxy removes CORS issues without me explicitly setting up CORS.
