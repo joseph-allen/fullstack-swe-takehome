@@ -28,6 +28,20 @@ You may need to build for Windows devices first
 DOCKER_BUILDKIT=1 docker compose build --no-cache
 ```
 
+### Mongo
+
+Shell with mongo-shell
+`mongosh mongodb://root:example@localhost:27017`
+
+Then run:
+
+```
+use my-db
+show collections
+db.parties.find().pretty()
+db.system.find().pretty()
+```
+
 ### Running locally
 
 If you've never run a Next app locally before, this more verbose guide is for you.
