@@ -295,7 +295,12 @@ API Endpoints:
 
 - GET /api/seats - availible seats number
 - POST /api/waitlist - Add party to waitlist
-- GET /api/waitlist/:id - Check party status, polled every 10 seconds.
+
+### Real-life context
+
+Instead of focusing on the simulation aspect, I thought about real life. Any resturant I've seen using this system usually can take orders by scanning a QR Code, and has a TV screen in the resturant that shows upcoming orders, or ready to serve orders. I've seen this in sushiro, kura sushi and din tai fung. I notice in their implementation, something lacking in mine. Where I was going to use a unique front-end generated ID to represent my users, a simple incrementing ID (say resetting daily so that ResturantID + Date + ID would form a UUID) means that we could show the most recently seated table, as an indication to all users. This means instead of polling in case the user is ready to seat, we are updating the users estimate as well as the desired functionality of seating the diners.
+
+I'm still going to generate and store the UUID from the user. This way we move away from the queue data structure, a database makes more sense, and extensability is simple. We could with this structure, have that TV Screen in-resturant. We also give a second chance to those who miss their slot.
 
 ### Features
 
