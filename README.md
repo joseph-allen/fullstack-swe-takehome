@@ -266,14 +266,15 @@ So the flow is as follows:
 - now - seatedAt >= partySize x 3s, mark as done, and increase availableSeats += partySize
 - While availableSeats allows - pop earliest waiting party and process.
 
-4. We assume customers are seated automatically and handled by the resturant, ending our flow.
+4. We assume customers are seated automatically and handled by the resturant, ending our flow. Users press a check-in button in their app, as required.
 
 Mongo:
 Parties
 
 ```
 {
-  id: String,
+  uuid: String,
+  partyID: String,
   name: String,
   size: Number,
   status: "waiting" | "seated" | "done",
@@ -363,3 +364,7 @@ Again I feel like I could have used a lot of nested if statements throughout the
 When I came to submit I realised my pre-commit hook didn't check for TS errors, which would later fail the build so I decided to take this time to tidy up some stray TS issues I'd seen in my editor. I extracted my first globally useful type up to a types folder too and realised I should probably have some sort of global style variables as I am picking and choosing colors and spacing to not get distracted. I made the site responsive with a single line change thanks to Material UI.
 
 I really enjoyed XState. I always felt Redux could be quite verbose, and requires you learn it's terminology to think of it the right way. Finite State Machines are about as simple as Computing gets, and was something I was already familiar with. There are some useful functions later, like the ability to invoke functions from calls that could come in handy with the queue processing.
+
+#### UUID
+
+Persisting the user across refreshes can be done with a UUID. I did this first with local storage for simplicity. I think I need the expiring nature of a cookie, as a diner could come back a few hours later. Expiry should be shorter than the longest table wait. This could probably be safely limited to "service time" with an option to reset the queue provided to the user. The cookie can hold the UUID, which will be sent with all API requests, meaning I can trust the API requests to identify the user.
