@@ -39,6 +39,7 @@
     "react-confetti-boom": "^1.1.2",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.56.4",
+    "uuid": "^11.1.0",
     "xstate": "^5.19.3"
   },
   "devDependencies": {

@@ -5,7 +5,7 @@ import Confetti from 'react-confetti-boom';
 import StatusComponent from '@/components/StatusComponent';
 import TableForm from '@/components/TableForm';
 import LoadingComponent from '@/components/LoadingComponent';
-
+import UUIDComponent from '@/components/UUIDComponent';
 import { useAppMachine } from '@/hooks/useAppMachine';
 type AppState =
   | 'idle'
@@ -29,6 +29,11 @@ export default function HomePage() {
 
   return (
     <>
+      {/* Set UUID   */}
+      <div style={{ position: 'absolute', top: 0, left: 0 }}>
+        <UUIDComponent />
+      </div>
+
       {current === 'formSubmitted' ? (
         <Box textAlign="center" mt={4}>
           <LoadingComponent text="Joining Queue" withDots />
@@ -94,6 +99,7 @@ export default function HomePage() {
               />
             )}
 
+            {/* TODO: If UUID already is in queue, route to this page */}
             {current === 'inQueue' && (
               <>
                 <LoadingComponent text="You're in the queue" withDots />

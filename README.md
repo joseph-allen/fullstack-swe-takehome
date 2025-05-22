@@ -295,6 +295,7 @@ API Endpoints:
 
 - GET /api/seats - availible seats number
 - POST /api/waitlist - Add party to waitlist
+- GET /api/user-info/[uuid] - get user details, for this browser if UUID already exists (accidental closed tab)
 
 ### Real-life context
 

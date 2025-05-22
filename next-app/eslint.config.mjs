@@ -21,7 +21,17 @@ export default [
       prettier: pluginPrettier,
     },
     rules: {
-      'prettier/prettier': 'warn', // You can change to "error"
+      'prettier/prettier': [
+        'warn',
+        {
+          semi: true,
+          singleQuote: true,
+          printWidth: 80,
+          trailingComma: 'es5',
+          tabWidth: 2,
+          useTabs: false,
+        },
+      ],
     },
   },
 
