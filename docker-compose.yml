@@ -9,6 +9,18 @@ services:
       - ./next-app:/app # Mount next-app directory to /app in container
     environment:
       - MONGODB_URI=mongodb://root:example@mongodb:27017
+      - BACKEND_URL=http://backend:4000
+    depends_on:
+      - mongodb
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    environment:
+      - MONGODB_URI=mongodb://root:example@mongodb:27017
     depends_on:
       - mongodb
 

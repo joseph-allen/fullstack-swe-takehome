@@ -12,4 +12,9 @@ npm run typecheck
 echo "Running tests in next-app..."
 npm run test:coverage
 
+# test backend
+cd ../backend
+echo "Running tests in backend..."
+npm test
+
 # exit 1 # uncomment to test husky

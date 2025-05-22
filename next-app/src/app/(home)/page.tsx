@@ -7,6 +7,8 @@ import TableForm from '@/components/TableForm';
 import LoadingComponent from '@/components/LoadingComponent';
 import UUIDComponent from '@/components/UUIDComponent';
 import { useAppMachine } from '@/hooks/useAppMachine';
+import { usePingDB } from '@/hooks/usePingDB';
+
 type AppState =
   | 'idle'
   | 'showForm'
@@ -26,12 +28,21 @@ export default function HomePage() {
   } = useAppMachine();
 
   const current = currentState as AppState;
+  const { data, error, isLoading } = usePingDB();
 
   return (
     <>
       {/* Set UUID   */}
       <div style={{ position: 'absolute', top: 0, left: 0 }}>
         <UUIDComponent />
+        {/* Display backend/MongoDB connection status */}
+        {isLoading && <Typography>Checking backend connection...</Typography>}
+        {error && (
+          <Typography color="error">
+            Backend error: {(error as Error).message}
+          </Typography>
+        )}
+        {data && <Typography color="success.main">Backend OK</Typography>}
       </div>
 
       {current === 'formSubmitted' ? (
