@@ -12,7 +12,8 @@ async function getNextPartyID(db) {
       { upsert: true, returnDocument: "after" }
     );
 
-  const padded = String(result.value.seq).padStart(3, "0");
+  // For padded strings
+  const padded = String(result.seq).padStart(3, "0");
   return padded;
 }
 
@@ -23,6 +24,7 @@ async function main() {
   // Ensure collections exist
   await db.createCollection("parties").catch(() => {});
   await db.createCollection("system").catch(() => {});
+  await db.createCollection("counters").catch(() => {});
 
   // Set up system singleton
   await db.collection("system").updateOne(
@@ -72,12 +74,10 @@ async function main() {
   ];
 
   for (const party of parties) {
-    // TODO: This should get an auto-incrementing party id
-    // party.partyID = await getNextPartyID(db);
+    party.partyID = await getNextPartyID(db);
     await db.collection("parties").insertOne(party);
   }
 
-  console.log("Database initialised with auto-incremented partyIDs");
   await client.close();
 }
 
