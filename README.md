@@ -6,6 +6,7 @@ Node Version - v22.15.0
 - [Live URL](https://fullstack-swe-takehome.vercel.app/)
 - [API Endpoint](https://fullstack-swe-takehome.vercel.app/api/test)
 - [Storybook](https://6823193a638044cca3f86e60-dqlkgbwbev.chromatic.com/)
+- [Local Swagger Deploy](http://localhost:4000/api-docs/)
 
 A full-stack application to manage restaurant waitlists, with real-time seating, queuing, and notifications for diners. Takehome task for TableCheck.
 
