@@ -390,3 +390,13 @@ I've decided to get to a walking skeleton state as fast as possible. My front en
 I've got a simple function that pings the DB every ten seconds, which will evenutally become the notification system. While this is greedy, it will let us update queue position quickly. This could be replaced with SSE or WebSockets later but I'm going to call that out of scope for this task.
 
 Docker compose let's me have a seperate docker container for each service, and a Next.js proxy removes CORS issues without me explicitly setting up CORS.
+
+#### Database
+
+I think the database could be unecessary for the sake of the tech test, but if I think about the real-world problem adding a resturant ID, and a date would basically let us analyse individual days service and give recommendations to resturants and predict their service.
+
+I think MongoDB is a good choice, in that it's extremely fast and flexible to get started with, and really we aren't doing much querying in this project. We will probably do some reduction and grabbing documents by index. Querying could have been helpful for grabbing individual states, but realistically a resturant is only going to have at most around 100 tables so we can be quite greedy algorithmically.
+
+We've got the issues of a monorepo now as well, while docker compose is happily handling that complexity, I would move parts out to git submodules if this were a more serious project.
+
+I've also lost view of the production deployment I had at the start. My E2E tests, and automated deploys are still working but as soon as I begin to incorporate API calls and real data into the system that won't work anymore. I also don't have any method of deploying the DB and backend at the moment. I'm going to call that out of scope but we could be using SQS queues, load balancers and CDN's to make this even more over-engineered.
