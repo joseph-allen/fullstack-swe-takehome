@@ -31,3 +31,12 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=example
     ports:
       - "27017:27017"
+
+  db-init:
+    build:
+      context: ./db-init
+      dockerfile: Dockerfile
+    environment:
+      - MONGODB_URI=mongodb://root:example@mongodb:27017
+    depends_on:
+      - mongodb
