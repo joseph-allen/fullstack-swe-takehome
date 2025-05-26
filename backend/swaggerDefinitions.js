@@ -1,6 +1,35 @@
 module.exports = {
   components: {
     schemas: {
+      PartyCreate: {
+        type: "object",
+        properties: {
+          uuid: {
+            type: "string",
+            description:
+              "Unique identifier for the party (client-generated UUID)",
+            example: "uuid-1",
+          },
+          name: {
+            type: "string",
+            description: "Name of the party",
+            example: "Alice",
+          },
+          size: {
+            type: "integer",
+            description: "Number of people in the party",
+            example: 2,
+          },
+          status: {
+            type: "string",
+            description: "Current status of the party",
+            enum: ["waiting", "seated", "done"],
+            example: "waiting",
+          },
+        },
+        required: ["uuid", "name", "size", "status"],
+        additionalProperties: false,
+      },
       Party: {
         type: "object",
         properties: {

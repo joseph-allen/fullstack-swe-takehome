@@ -1,6 +1,7 @@
 const app = require("./server");
 const mongoose = require("mongoose");
 
+// TODO: MongoDB URI should connect to my-db
 const port = 4000;
 const mongoUri =
   process.env.MONGODB_URI || "mongodb://root:example@mongodb:27017";

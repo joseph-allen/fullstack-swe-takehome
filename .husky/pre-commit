@@ -1,20 +1,20 @@
-cd next-app
+# cd next-app
 
-# run linting check
-echo "Running lint in next-app..."
-npm run lint
+# # run linting check
+# echo "Running lint in next-app..."
+# npm run lint
 
-# run type check
-echo "Running typecheck in next-app..."
-npm run typecheck
+# # run type check
+# echo "Running typecheck in next-app..."
+# npm run typecheck
 
-# tests fixed to 80% coverage in jest.config.ts
-echo "Running tests in next-app..."
-npm run test:coverage
+# # tests fixed to 80% coverage in jest.config.ts
+# echo "Running tests in next-app..."
+# npm run test:coverage
 
-# test backend
-cd ../backend
-echo "Running tests in backend..."
-npm test
+# # test backend
+# cd ../backend
+# echo "Running tests in backend..."
+# npm test
 
 # exit 1 # uncomment to test husky

@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const Party = require("../models/Party");
 
 /**
  * @swagger
@@ -25,9 +26,13 @@ const router = express.Router();
  *                 $ref: '#/components/schemas/Party'
  */
 router.get("/", async (req, res) => {
-  const db = req.app.locals.db;
-  const parties = await db.collection("parties").find().toArray();
-  res.json(parties);
+  try {
+    const parties = await Party.find();
+    res.status(200).json(parties);
+  } catch (error) {
+    console.error("Error fetching parties:", error);
+    res.status(500).json({ error: "Failed to fetch parties" });
+  }
 });
 
 /**
@@ -78,16 +83,25 @@ router.get("/", async (req, res) => {
  */
 router.post("/", async (req, res) => {
   try {
-    const party = req.body;
+    const { uuid, name, size } = req.body;
 
-    if (!party.uuid || !party.name || typeof party.size !== "number") {
+    if (!uuid || !name || typeof size !== "number") {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    const db = req.app.locals.db;
-    const result = await db.collection("parties").insertOne(party);
+    // TODO: migrate partyID logic from init script to here
+    // TODO: Add tests
+    // TODO: Some connections are adding to the default, test database
+    const newParty = new Party({
+      uuid,
+      name,
+      size,
+      createdAt: new Date(),
+      partyID: "101", // Default hardcoded for now
+    });
 
-    res.status(201).json({ message: "Party created", id: result.insertedId });
+    const savedParty = await newParty.save();
+    res.status(201).json({ message: "Party created", id: savedParty.partyID });
   } catch (error) {
     console.error("Error inserting party:", error);
     res.status(500).json({ error: "Failed to insert party" });

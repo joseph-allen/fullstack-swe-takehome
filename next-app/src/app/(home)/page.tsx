@@ -5,9 +5,11 @@ import Confetti from 'react-confetti-boom';
 import StatusComponent from '@/components/StatusComponent';
 import TableForm from '@/components/TableForm';
 import LoadingComponent from '@/components/LoadingComponent';
-import UUIDComponent from '@/components/UUIDComponent';
 import { useAppMachine } from '@/hooks/useAppMachine';
 import { usePingDB } from '@/hooks/usePingDB';
+import { useJoinQueueMutation } from '@/hooks/useJoinQueueMutation';
+import { useUUID } from '@/context/UUIDContext';
+import { useEffect } from 'react';
 
 type AppState =
   | 'idle'
@@ -27,14 +29,32 @@ export default function HomePage() {
     reset,
   } = useAppMachine();
 
+  const { uuid, removeUUID } = useUUID();
   const current = currentState as AppState;
   const { data, error, isLoading } = usePingDB();
 
+  const mutation = useJoinQueueMutation(() => {
+    queueJoined(); // your callback for successful join
+  });
+
+  useEffect(() => {
+    if (mutation.isLoading) {
+      submitForm(); // move to 'formSubmitted' state
+    }
+  }, [mutation.isLoading, submitForm]);
+
   return (
     <>
-      {/* Set UUID   */}
+      {/* Check DB Connection   */}
       <div style={{ position: 'absolute', top: 0, left: 0 }}>
-        <UUIDComponent />
+        {!uuid ? (
+          <p>Loading UUID...</p>
+        ) : (
+          <>
+            <p>Your UUID: {uuid}</p>
+            <button onClick={removeUUID}>Clear UUID</button>
+          </>
+        )}
         {/* Display backend/MongoDB connection status */}
         {isLoading && <Typography>Checking backend connection...</Typography>}
         {error && (
@@ -101,12 +121,19 @@ export default function HomePage() {
               </>
             )}
 
+            {/* Pass in UUID here */}
             {current === 'showForm' && (
               <TableForm
-                onSubmit={() => {
-                  console.log('submit');
-                  submitForm();
+                onSubmit={(data) => {
+                  const payload = {
+                    uuid,
+                    name: data.name,
+                    size: data.partySize, // these should match my API
+                    status: 'waiting',
+                  };
+                  mutation.mutate(payload);
                 }}
+                isLoading={mutation.isLoading}
               />
             )}
 

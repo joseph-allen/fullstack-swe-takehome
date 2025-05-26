@@ -11,6 +11,7 @@ services:
       - MONGODB_URI=mongodb://root:example@mongodb:27017
       - BACKEND_URL=http://backend:4000
     depends_on:
+      - backend # Ensure backend service is started before app
       - mongodb
 
   backend:
@@ -23,6 +24,7 @@ services:
       - MONGODB_URI=mongodb://root:example@mongodb:27017
     depends_on:
       - mongodb
+      - db-init
 
   mongodb:
     image: mongo

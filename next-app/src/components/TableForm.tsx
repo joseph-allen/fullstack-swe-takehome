@@ -15,7 +15,8 @@ import { TableFormValues } from '@/types/tableForm';
 
 export const TableForm: React.FC<{
   onSubmit?: (data: TableFormValues) => void;
-}> = ({ onSubmit }) => {
+  isLoading?: boolean;
+}> = ({ onSubmit, isLoading }) => {
   const {
     register,
     handleSubmit,
@@ -120,8 +121,13 @@ export const TableForm: React.FC<{
             ))}
           </Box>
 
-          <Button type="submit" variant="contained" fullWidth>
-            Submit
+          <Button
+            type="submit"
+            variant="contained"
+            fullWidth
+            disabled={isLoading}
+          >
+            {isLoading ? 'Submitting...' : 'Submit'}
           </Button>
         </Stack>
       </form>
