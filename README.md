@@ -403,3 +403,9 @@ We've got the issues of a monorepo now as well, while docker compose is happily 
 I've also lost view of the production deployment I had at the start. My E2E tests, and automated deploys are still working but as soon as I begin to incorporate API calls and real data into the system that won't work anymore. I also don't have any method of deploying the DB and backend at the moment. I'm going to call that out of scope but we could be using SQS queues, load balancers and CDN's to make this even more over-engineered.
 
 I've initialised the mongoDB with some example data, so extending this so the resturant starts full, and we have a notion of the system of the resturant means a user may actually need to queue. I added an auto-incrementing "ID" purely for the user so they aren't exposed to their UUID. Again this is a pattern I've seen at many resturants and I think it gives the benefit of a "waiting time estimation" that stranger ID's don't give. This doesn't help the data structure, as mongoDB documents can be sorted by insertion time. There is functionality in this script that should be moved to my backend. For now I wanted to make sure MongoDB could hold and manipulate documents as I required.
+
+#### Posting new Parties
+
+With all the work done so far, adding a new endpoint is trivial. I decided to take the easiness of this task as a gap to formalise the backend a little. We now have auto-generating Swagger API documentation, a place for backend Schemas, and a place for routes. The main server file is growing in complexity so I'm moving out anything that is cluttering that file.
+
+At this point the backend posts are tested, and working but not yet integrated into the front-end. This will be the first time we use real data and actions in our front-end, meaning we are about to make all our tests there require mocking and a decision as to whether we update E2E tests or not.
