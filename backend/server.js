@@ -1,4 +1,5 @@
 const express = require("express");
+const partyRoutes = require("./routes/parties");
 
 const app = express();
 
@@ -7,6 +8,8 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("Hello from Express backend!");
 });
+
+app.use("/parties", partyRoutes);
 
 app.get("/ping-db", async (req, res) => {
   try {
