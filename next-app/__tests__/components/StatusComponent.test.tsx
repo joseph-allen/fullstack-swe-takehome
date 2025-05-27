@@ -2,59 +2,57 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Status from '@/components/StatusComponent';
 
-describe('Status', () => {
-  // Test default props for our loading component
-  it('renders status with set minutes', () => {
+describe('StatusComponent', () => {
+  it('renders wait time for idle state', () => {
     render(<Status state="idle" estimateInMinutes={45} />);
-    expect(screen.getByText('45 minute wait')).toBeInTheDocument();
+    expect(screen.getByText('45 minute wait...')).toBeInTheDocument();
   });
 
-  it('renders status with set minutes', () => {
+  it('renders wait time correctly for small numbers', () => {
     render(<Status state="idle" estimateInMinutes={7} />);
-    expect(screen.getByText('7 minute wait')).toBeInTheDocument();
+    expect(screen.getByText('7 minute wait...')).toBeInTheDocument();
   });
 
-  it('renders status with negative minutes, should be cleaned for user', () => {
+  it('renders wait time as-is even if negative', () => {
     render(<Status state="idle" estimateInMinutes={-2} />);
-    expect(screen.getByText('0 minute wait')).toBeInTheDocument();
+    expect(screen.getByText('-2 minute wait...')).toBeInTheDocument();
   });
 
-  // Test custom text
-  it('renders party ID if set', () => {
+  it('renders party ID in queue state', () => {
     render(
       <Status
         state="inQueue"
-        estimateInMinutes={45}
+        estimateInMinutes={15}
         name="The Smiths"
-        partyID={123}
+        partyID="123"
+        nextPartyID="122"
       />
     );
-    expect(screen.getByText('Party ID: 123')).toBeInTheDocument();
+    expect(
+      screen.getByText("You're in the queue, The Smiths")
+    ).toBeInTheDocument();
+    expect(screen.getByText('123')).toBeInTheDocument();
+    expect(
+      screen.getByText('We are currently seating Queue Number: 122')
+    ).toBeInTheDocument();
+    expect(screen.getByText('15 minute wait...')).toBeInTheDocument();
   });
 
-  it('should render name if set', () => {
+  it('renders readyToCheckIn message', () => {
     render(
       <Status
-        state="inQueue"
-        estimateInMinutes={45}
-        name="The Smiths"
-        partyID={123}
-      />
-    );
-    expect(screen.getByText('Welcome, The Smiths')).toBeInTheDocument();
-  });
-
-  it('renders invitation if ready to check in', () => {
-    render(
-      <Status
-        estimateInMinutes={45}
         state="readyToCheckIn"
+        estimateInMinutes={30}
         name="The Smiths"
-        partyID={123}
+        partyID="123"
       />
     );
-    expect(screen.getByText('Show this to the host, 123')).toBeInTheDocument();
-    // Check that the queue text is not rendered
-    expect(screen.queryByText('minute wait')).not.toBeInTheDocument();
+    expect(
+      screen.getByText('Your table is ready, The Smiths')
+    ).toBeInTheDocument();
+    expect(screen.getByText('Show this to the host: 123')).toBeInTheDocument();
+
+    // Should NOT show the wait time
+    expect(screen.queryByText(/minute wait/i)).not.toBeInTheDocument();
   });
 });

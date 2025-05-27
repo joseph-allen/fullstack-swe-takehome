@@ -17,7 +17,6 @@ app.use("/parties", partyRoutes);
 app.get("/ping-db", async (req, res) => {
   try {
     // ping to check alive
-    // TODO: Later this will send next party to
     const db = req.app.locals.db;
     if (!db) throw new Error("Database not connected yet");
 
