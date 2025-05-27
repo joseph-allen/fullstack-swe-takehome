@@ -11,6 +11,8 @@ mongoose
   })
   .then(() => {
     console.log("Connected to MongoDB");
+    // Set the database connection to app.locals for later use
+    app.locals.db = mongoose.connection.db;
     app.listen(port, () => {
       console.log(`Express server running on port ${port}`);
     });

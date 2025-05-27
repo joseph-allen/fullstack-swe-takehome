@@ -9,7 +9,7 @@ import { useAppMachine } from '@/hooks/useAppMachine';
 import { usePingDB } from '@/hooks/usePingDB';
 import { useJoinQueueMutation } from '@/hooks/useJoinQueueMutation';
 import { useUUID } from '@/context/UUIDContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 type AppState =
   | 'idle'
@@ -33,11 +33,20 @@ export default function HomePage() {
   const current = currentState as AppState;
   const { data, error, isLoading } = usePingDB();
   const [joinedPartyID, setJoinedPartyID] = useState<string>('000');
+  const [totalSeats, setTotalSeats] = useState<number | null>(null);
+  const [availableSeats, setAvailableSeats] = useState<number | null>(null);
 
   const mutation = useJoinQueueMutation((data) => {
     setJoinedPartyID(data.id);
     queueJoined();
   });
+
+  useEffect(() => {
+    if (data?.system?.[0]) {
+      setTotalSeats(data.system[0].totalSeats);
+      setAvailableSeats(data.system[0].availableSeats);
+    }
+  }, [data]);
 
   return (
     <>
@@ -58,7 +67,17 @@ export default function HomePage() {
             Backend error: {(error as Error).message}
           </Typography>
         )}
-        {data && <Typography color="success.main">Backend OK</Typography>}
+        {data && (
+          <>
+            <Typography color="success.main">Backend OK</Typography>
+            {data.system?.[0] && (
+              <div>
+                <Typography>Total Seats: {totalSeats}</Typography>
+                <Typography>Available Seats: {availableSeats}</Typography>
+              </div>
+            )}
+          </>
+        )}
         {joinedPartyID && (
           <Typography>
             Assigned partyID: <strong>{joinedPartyID}</strong>
