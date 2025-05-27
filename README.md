@@ -417,3 +417,16 @@ That concludes what I think will be the largest PR of the entire project, once I
 For a RESTful API, I think the right choice here is to make a single endpoint to patch the status of parties. I could make things more maintainable by splitting this route into two helper routes for setting a party to seated, and done and seperating out the logic from there.
 
 I've got the polling of the database working here, so now I need to finally decide on where the queue processing is going to happen. Allowing users to check in reduces complexity as I can trust my users to check in and I will simulate them moving to done later. It's a huge assumption to trust users to check in in real life, given more time I'd probably have some element of notifying the user a few times, before expiring. In real resturants I've seen this expiry treated fairly kindly with a reinsertion to the top of a queue.
+
+At this point, I think adding two more values to my system collection would allow my front-end to respond to that entire collection to handle state, and table readiness.
+
+```
+"nextPartyId": "101",
+"nextPartySize": 4,
+"totalSeats": 10,
+"availableSeats": 6
+```
+
+would mean any next poll, would have all information needed to confidently offer a table to party 101.
+
+I'm just going to add some table visualisation to the little dev panel now to prepare for this.

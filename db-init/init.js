@@ -26,25 +26,13 @@ async function main() {
   await db.createCollection("system").catch(() => {});
   await db.createCollection("counters").catch(() => {});
 
-  // Set up system singleton
-  await db.collection("system").updateOne(
-    { _id: "singleton" },
-    {
-      $setOnInsert: {
-        totalSeats: 10,
-        availableSeats: 10,
-      },
-    },
-    { upsert: true }
-  );
-
-  // Clear previous parties
+  // Clear previous data
   await db.collection("parties").deleteMany({});
-
-  // Reset counter
   await db
     .collection("counters")
     .updateOne({ _id: "partyID" }, { $set: { seq: 0 } }, { upsert: true });
+
+  const TOTAL_SEATS = 10;
 
   // Insert sample data
   const parties = [
@@ -52,24 +40,24 @@ async function main() {
       uuid: "uuid-1",
       name: "Alice",
       size: 2,
-      status: "waiting",
+      status: "seated",
       createdAt: new Date(),
     },
     {
       uuid: "uuid-2",
       name: "Bob",
-      size: 4,
+      size: 6,
       status: "seated",
       createdAt: new Date(Date.now() - 10 * 60 * 1000),
-      seatedAt: new Date(Date.now() - 5 * 60 * 1000),
+      seatedAt: new Date(),
     },
     {
       uuid: "uuid-3",
       name: "Charlie",
       size: 2,
-      status: "done",
+      status: "seated",
       createdAt: new Date(Date.now() - 30 * 60 * 1000),
-      seatedAt: new Date(Date.now() - 27 * 60 * 1000),
+      seatedAt: new Date(),
     },
   ];
 
@@ -77,6 +65,29 @@ async function main() {
     party.partyID = await getNextPartyID(db);
     await db.collection("parties").insertOne(party);
   }
+
+  // Calculate current occupied seats
+  const seatedParties = await db
+    .collection("parties")
+    .find({ status: "seated" })
+    .toArray();
+  const occupiedSeats = seatedParties.reduce(
+    (sum, p) => sum + (p.size || 0),
+    0
+  );
+  const availableSeats = TOTAL_SEATS - occupiedSeats;
+
+  // Update system singleton after party insertion
+  await db.collection("system").updateOne(
+    { _id: "singleton" },
+    {
+      $set: {
+        totalSeats: TOTAL_SEATS,
+        availableSeats,
+      },
+    },
+    { upsert: true }
+  );
 
   await client.close();
 }

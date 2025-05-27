@@ -1,16 +1,17 @@
 'use client';
 
-import { Typography, Divider, Button, Box } from '@mui/material';
 import Confetti from 'react-confetti-boom';
 import StatusComponent from '@/components/StatusComponent';
 import TableForm from '@/components/TableForm';
 import LoadingComponent from '@/components/LoadingComponent';
 import { useAppMachine } from '@/hooks/useAppMachine';
-import { usePingDB } from '@/hooks/usePingDB';
+// import { usePingDB } from '@/hooks/usePingDB';
 import { useUpdatePartyStatus } from '@/hooks/useUpdatePartyStatus';
 import { useJoinQueueMutation } from '@/hooks/useJoinQueueMutation';
 import { useUUID } from '@/context/UUIDContext';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { Typography, Divider, Button, Box } from '@mui/material';
+import DevPanel from '@/components/DevPanel';
 
 type AppState =
   | 'idle'
@@ -30,9 +31,9 @@ export default function HomePage() {
     reset,
   } = useAppMachine();
 
-  const { uuid, removeUUID } = useUUID();
+  const { uuid } = useUUID();
   const current = currentState as AppState;
-  const { data, error, isLoading } = usePingDB();
+  // const { data } = usePingDB();
   const {
     updatePartyStatus,
     loading: patchLoading,
@@ -40,62 +41,25 @@ export default function HomePage() {
   } = useUpdatePartyStatus();
 
   const [joinedPartyID, setJoinedPartyID] = useState<string>('000');
-  const [totalSeats, setTotalSeats] = useState<number | null>(null);
-  const [availableSeats, setAvailableSeats] = useState<number | null>(null);
+  // const [totalSeats, setTotalSeats] = useState<number>(10);
+  // const [availableSeats, setAvailableSeats] = useState<number | null>(null);
 
   const mutation = useJoinQueueMutation((data) => {
     setJoinedPartyID(data.id);
     queueJoined();
   });
 
-  useEffect(() => {
-    if (data?.system?.[0]) {
-      setTotalSeats(data.system[0].totalSeats);
-      setAvailableSeats(data.system[0].availableSeats);
-    }
-  }, [data]);
+  // useEffect(() => {
+  //   if (data?.system?.[0]) {
+  //     setTotalSeats(data.system[0].totalSeats);
+  //     setAvailableSeats(data.system[0].availableSeats);
+  //   }
+  // }, [data]);
 
   return (
     <>
       {/* Check DB Connection   */}
-      <div style={{ position: 'absolute', top: 0, left: 0 }}>
-        {!uuid ? (
-          <p>Loading UUID...</p>
-        ) : (
-          <>
-            <p>Your UUID: {uuid}</p>
-            <button onClick={removeUUID}>Clear UUID</button>
-          </>
-        )}
-        {/* Display backend/MongoDB connection status */}
-        {isLoading && <Typography>Checking backend connection...</Typography>}
-        {error && (
-          <Typography color="error">
-            Backend error: {(error as Error).message}
-          </Typography>
-        )}
-        {data && (
-          <>
-            <Typography color="success.main">Backend OK</Typography>
-            {data.system?.[0] && (
-              <div>
-                <Typography>Total Seats: {totalSeats}</Typography>
-                <Typography>Available Seats: {availableSeats}</Typography>
-              </div>
-            )}
-          </>
-        )}
-        {joinedPartyID && (
-          <Typography>
-            Assigned partyID: <strong>{joinedPartyID}</strong>
-          </Typography>
-        )}
-        {patchError && (
-          <Typography color="error" mt={2}>
-            Error updating status: {patchError}
-          </Typography>
-        )}
-      </div>
+      <DevPanel joinedPartyID={joinedPartyID} patchError={patchError} />
 
       {current === 'formSubmitted' ? (
         <Box textAlign="center" mt={4}>
