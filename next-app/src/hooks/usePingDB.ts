@@ -14,5 +14,6 @@ export function usePingDB() {
     queryFn: fetchPing,
     staleTime: 10 * 1000,
     retry: 1,
+    refetchInterval: 10 * 1000,
   });
 }

@@ -4,6 +4,7 @@ import { useClientUUID } from '@/hooks/useClientUUID';
 interface UUIDContextValue {
   uuid: string | null;
   removeUUID: () => void;
+  resetUUID: () => void;
 }
 
 const UUIDContext = createContext<UUIDContextValue | undefined>(undefined);
@@ -11,10 +12,10 @@ const UUIDContext = createContext<UUIDContextValue | undefined>(undefined);
 export const UUIDProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { uuid, removeUUID } = useClientUUID();
+  const { uuid, removeUUID, resetUUID } = useClientUUID();
 
   return (
-    <UUIDContext.Provider value={{ uuid, removeUUID }}>
+    <UUIDContext.Provider value={{ uuid, removeUUID, resetUUID }}>
       {children}
     </UUIDContext.Provider>
   );

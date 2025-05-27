@@ -1,17 +1,17 @@
 'use client';
 
+import { useState } from 'react';
 import Confetti from 'react-confetti-boom';
 import StatusComponent from '@/components/StatusComponent';
 import TableForm from '@/components/TableForm';
 import LoadingComponent from '@/components/LoadingComponent';
 import { useAppMachine } from '@/hooks/useAppMachine';
-// import { usePingDB } from '@/hooks/usePingDB';
 import { useUpdatePartyStatus } from '@/hooks/useUpdatePartyStatus';
 import { useJoinQueueMutation } from '@/hooks/useJoinQueueMutation';
 import { useUUID } from '@/context/UUIDContext';
-import { useState } from 'react';
 import { Typography, Divider, Button, Box } from '@mui/material';
 import DevPanel from '@/components/DevPanel';
+// import { usePingDB } from '@/hooks/usePingDB';
 
 type AppState =
   | 'idle'
@@ -31,9 +31,12 @@ export default function HomePage() {
     reset,
   } = useAppMachine();
 
-  const { uuid } = useUUID();
+  const { uuid, removeUUID, resetUUID } = useUUID();
+
   const current = currentState as AppState;
+
   // const { data } = usePingDB();
+
   const {
     updatePartyStatus,
     loading: patchLoading,
@@ -49,6 +52,7 @@ export default function HomePage() {
     queueJoined();
   });
 
+  // Update state whenever data changes
   // useEffect(() => {
   //   if (data?.system?.[0]) {
   //     setTotalSeats(data.system[0].totalSeats);
@@ -58,19 +62,26 @@ export default function HomePage() {
 
   return (
     <>
-      {/* Check DB Connection   */}
+      {/* Check DB Connection */}
       <DevPanel joinedPartyID={joinedPartyID} patchError={patchError} />
 
       {current === 'formSubmitted' ? (
         <Box textAlign="center" mt={4}>
           <LoadingComponent text="Joining Queue" withDots />
           <Button
-            variant="outlined"
-            color="error"
+            variant="contained"
+            size="small"
+            sx={{
+              bgcolor: '#00FF00',
+              color: '#000',
+              fontFamily: 'Courier New, monospace',
+              '&:hover': {
+                bgcolor: '#00CC00',
+              },
+            }}
             onClick={queueJoined}
-            sx={{ mt: 2 }}
           >
-            Skip wait (dev button)
+            Skip wait
           </Button>
         </Box>
       ) : (
@@ -84,12 +95,19 @@ export default function HomePage() {
             />
           </div>
 
-          {/* TODO: To be removed later */}
           {current === 'readyToCheckIn' && uuid && (
             <Box mt={2} display="flex" gap={2} justifyContent="center">
               <Button
                 variant="contained"
-                color="primary"
+                size="small"
+                sx={{
+                  bgcolor: '#00FF00',
+                  color: '#000',
+                  fontFamily: 'Courier New, monospace',
+                  '&:hover': {
+                    bgcolor: '#00CC00',
+                  },
+                }}
                 onClick={() => updatePartyStatus(uuid, 'seated')}
                 disabled={patchLoading}
               >
@@ -97,14 +115,38 @@ export default function HomePage() {
               </Button>
               <Button
                 variant="contained"
-                color="success"
+                size="small"
+                sx={{
+                  bgcolor: '#00FF00',
+                  color: '#000',
+                  fontFamily: 'Courier New, monospace',
+                  '&:hover': {
+                    bgcolor: '#00CC00',
+                  },
+                }}
                 onClick={() => updatePartyStatus(uuid, 'done')}
                 disabled={patchLoading}
               >
                 Mark as Done
               </Button>
               {/* dev button reset */}
-              <Button variant="outlined" color="warning" onClick={reset}>
+              <Button
+                variant="contained"
+                size="small"
+                sx={{
+                  bgcolor: '#00FF00',
+                  color: '#000',
+                  fontFamily: 'Courier New, monospace',
+                  '&:hover': {
+                    bgcolor: '#00CC00',
+                  },
+                }}
+                onClick={() => {
+                  reset();
+                  removeUUID();
+                  resetUUID();
+                }}
+              >
                 Reset
               </Button>
             </Box>
@@ -131,7 +173,6 @@ export default function HomePage() {
               </>
             )}
 
-            {/* Pass in UUID here */}
             {current === 'showForm' && (
               <TableForm
                 onSubmit={(data) => {
@@ -142,17 +183,13 @@ export default function HomePage() {
                     status: 'waiting',
                   };
 
-                  // Move to formSubmitted state immediately
                   submitForm();
-
-                  // Fire the mutation
                   mutation.mutate(payload);
                 }}
                 isLoading={mutation.status === 'pending'}
               />
             )}
 
-            {/* TODO: If UUID already is in queue, route to this page */}
             {current === 'inQueue' && (
               <>
                 <LoadingComponent text="You're in the queue" withDots />
@@ -167,12 +204,19 @@ export default function HomePage() {
                   </Button>
                 </div>
                 <Button
-                  variant="outlined"
-                  color="error"
+                  variant="contained"
+                  size="small"
+                  sx={{
+                    bgcolor: '#00FF00',
+                    color: '#000',
+                    fontFamily: 'Courier New, monospace',
+                    '&:hover': {
+                      bgcolor: '#00CC00',
+                    },
+                  }}
                   onClick={readyToCheckIn}
-                  style={{ marginTop: '16px' }}
                 >
-                  Ready to Check In (dev button)
+                  Ready to Check In
                 </Button>
               </>
             )}

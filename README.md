@@ -429,4 +429,4 @@ At this point, I think adding two more values to my system collection would allo
 
 would mean any next poll, would have all information needed to confidently offer a table to party 101.
 
-I'm just going to add some table visualisation to the little dev panel now to prepare for this.
+I'm just going to add some table visualisation to the little dev panel now to prepare for this. I've fleshed out the dev panel now too. I wouldn't include this in a real site, but considering the rapid state changes we expect from the database and backend this is quite a nice way for me to visually confirm things look correct as I play around. A version of this panel could be what the resturant sees, or even a progress bar for the user while waiting.
