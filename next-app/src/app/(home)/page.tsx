@@ -7,6 +7,7 @@ import TableForm from '@/components/TableForm';
 import LoadingComponent from '@/components/LoadingComponent';
 import { useAppMachine } from '@/hooks/useAppMachine';
 import { usePingDB } from '@/hooks/usePingDB';
+import { useUpdatePartyStatus } from '@/hooks/useUpdatePartyStatus';
 import { useJoinQueueMutation } from '@/hooks/useJoinQueueMutation';
 import { useUUID } from '@/context/UUIDContext';
 import { useState, useEffect } from 'react';
@@ -32,6 +33,12 @@ export default function HomePage() {
   const { uuid, removeUUID } = useUUID();
   const current = currentState as AppState;
   const { data, error, isLoading } = usePingDB();
+  const {
+    updatePartyStatus,
+    loading: patchLoading,
+    error: patchError,
+  } = useUpdatePartyStatus();
+
   const [joinedPartyID, setJoinedPartyID] = useState<string>('000');
   const [totalSeats, setTotalSeats] = useState<number | null>(null);
   const [availableSeats, setAvailableSeats] = useState<number | null>(null);
@@ -83,6 +90,11 @@ export default function HomePage() {
             Assigned partyID: <strong>{joinedPartyID}</strong>
           </Typography>
         )}
+        {patchError && (
+          <Typography color="error" mt={2}>
+            Error updating status: {patchError}
+          </Typography>
+        )}
       </div>
 
       {current === 'formSubmitted' ? (
@@ -109,15 +121,29 @@ export default function HomePage() {
           </div>
 
           {/* TODO: To be removed later */}
-          {current === 'readyToCheckIn' && (
-            <Button
-              variant="outlined"
-              color="error"
-              onClick={reset}
-              style={{ marginTop: '16px' }}
-            >
-              Reset (dev button)
-            </Button>
+          {current === 'readyToCheckIn' && uuid && (
+            <Box mt={2} display="flex" gap={2} justifyContent="center">
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => updatePartyStatus(uuid, 'seated')}
+                disabled={patchLoading}
+              >
+                Mark as Seated
+              </Button>
+              <Button
+                variant="contained"
+                color="success"
+                onClick={() => updatePartyStatus(uuid, 'done')}
+                disabled={patchLoading}
+              >
+                Mark as Done
+              </Button>
+              {/* dev button reset */}
+              <Button variant="outlined" color="warning" onClick={reset}>
+                Reset
+              </Button>
+            </Box>
           )}
 
           {current !== 'readyToCheckIn' && <Divider flexItem />}

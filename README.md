@@ -411,3 +411,9 @@ With all the work done so far, adding a new endpoint is trivial. I decided to ta
 At this point the backend posts are tested, and working but not yet integrated into the front-end. This will be the first time we use real data and actions in our front-end, meaning we are about to make all our tests there require mocking and a decision as to whether we update E2E tests or not.
 
 That concludes what I think will be the largest PR of the entire project, once I had the real partyID back from the API the rest of the front-end flow worked without much integration. I had some issues with the MongoDB that took a while to resolve, and I took this as a change to move some logic around into helper functions with their own tests, bringing out environment variables which would normally be in a .gitignore. Since this PR bridges all our pieces more formally, we had to lock types and variable names more intentionally so there was a bit of tidying up here that fluffed up this PR that really should have come in seperate tasks.
+
+#### Updating existing parties
+
+For a RESTful API, I think the right choice here is to make a single endpoint to patch the status of parties. I could make things more maintainable by splitting this route into two helper routes for setting a party to seated, and done and seperating out the logic from there.
+
+I've got the polling of the database working here, so now I need to finally decide on where the queue processing is going to happen. Allowing users to check in reduces complexity as I can trust my users to check in and I will simulate them moving to done later. It's a huge assumption to trust users to check in in real life, given more time I'd probably have some element of notifying the user a few times, before expiring. In real resturants I've seen this expiry treated fairly kindly with a reinsertion to the top of a queue.

@@ -35,9 +35,12 @@ export async function POST(request: NextRequest) {
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error('Error proxying POST /parties:', error);
+    console.error('Error proxying PATCH /parties:', error);
     return NextResponse.json(
-      { error: 'Failed to create party' },
+      {
+        error:
+          error instanceof Error ? error.message : 'Failed to update party',
+      },
       { status: 500 }
     );
   }

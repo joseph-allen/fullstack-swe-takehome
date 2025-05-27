@@ -25,6 +25,8 @@ module.exports = {
             description: "Current status of the party",
             enum: ["waiting", "seated", "done"],
             example: "waiting",
+            default: "waiting",
+            required: true,
           },
         },
         required: ["uuid", "name", "size", "status"],

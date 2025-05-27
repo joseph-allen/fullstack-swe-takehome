@@ -5,7 +5,12 @@ const partySchema = new mongoose.Schema({
   name: { type: String, required: true },
   size: { type: Number, required: true },
   createdAt: { type: Date, default: Date.now },
-  partyID: { type: String, default: "101" }, // Set default or assign later
+  partyID: { type: String, default: "000" },
+  status: {
+    type: String,
+    enum: ["waiting", "seated", "done"],
+    default: "waiting",
+  },
 });
 
 module.exports = mongoose.model("Party", partySchema);
