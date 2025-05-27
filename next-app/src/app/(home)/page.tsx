@@ -13,6 +13,7 @@ import { useAppMachine } from '@/hooks/useAppMachine';
 import { useUpdatePartyStatus } from '@/hooks/useUpdatePartyStatus';
 import { useJoinQueueMutation } from '@/hooks/useJoinQueueMutation';
 import { usePingDB } from '@/hooks/usePingDB';
+import { useParty } from '@/hooks/useParty';
 import { useUUID } from '@/context/UUIDContext';
 
 type AppState =
@@ -31,9 +32,13 @@ export default function HomePage() {
     leaveQueue,
     readyToCheckIn,
     reset,
+    forceInQueue,
+    forceReady,
   } = useAppMachine();
 
   const { uuid, removeUUID, resetUUID } = useUUID();
+  const { party, loading: partyLoading, error: partyError } = useParty(uuid);
+
   const current = currentState as AppState;
 
   const { data: pingData } = usePingDB();
@@ -58,6 +63,33 @@ export default function HomePage() {
     if (!partyID || !nextPartyID) return 0;
     return Math.max(0, (parseInt(partyID) - parseInt(nextPartyID)) * 5);
   }
+
+  useEffect(() => {
+    if (!uuid) {
+      console.log('No UUID, skipping fetch');
+      return;
+    }
+
+    async function fetchParty() {
+      console.log('Fetching party for UUID:', uuid);
+      // ...
+    }
+
+    fetchParty();
+  }, [uuid]);
+
+  useEffect(() => {
+    console.log('party in DB');
+    if (party && !partyLoading && !partyError) {
+      if (party.status === 'waiting') {
+        forceInQueue();
+        setJoinedPartyID(party.partyID);
+      } else {
+        // TODO: check this works once ready to check in works
+        reset();
+      }
+    }
+  }, [party, partyLoading, partyError, forceInQueue, forceReady, reset]);
 
   useEffect(() => {
     if (pingData?.system?.[0]) {

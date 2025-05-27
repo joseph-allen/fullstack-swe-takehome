@@ -12,5 +12,7 @@ export function useAppMachine() {
     leaveQueue: () => send({ type: 'LEAVE' }),
     readyToCheckIn: () => send({ type: 'READY' }),
     reset: () => send({ type: 'RESET' }),
+    forceInQueue: () => send({ type: 'FORCE_INQUEUE' }),
+    forceReady: () => send({ type: 'FORCE_READY' }),
   };
 }

@@ -105,4 +105,25 @@ describe('useAppMachine hook', () => {
 
     expect(result.current.currentState).toBe('idle');
   });
+
+  /** 🔽 New tests for force transitions */
+  it('jumps directly from idle → inQueue on forceInQueue()', () => {
+    const { result } = renderHook(() => useAppMachine());
+
+    act(() => {
+      result.current.forceInQueue();
+    });
+
+    expect(result.current.currentState).toBe('inQueue');
+  });
+
+  it('jumps directly from idle → readyToCheckIn on forceReady()', () => {
+    const { result } = renderHook(() => useAppMachine());
+
+    act(() => {
+      result.current.forceReady();
+    });
+
+    expect(result.current.currentState).toBe('readyToCheckIn');
+  });
 });
