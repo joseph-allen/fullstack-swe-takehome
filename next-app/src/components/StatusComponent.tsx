@@ -4,16 +4,18 @@ import Box from '@mui/material/Box';
 
 type StatusComponentProps = {
   state: 'idle' | 'showForm' | 'formSubmitted' | 'inQueue' | 'readyToCheckIn';
-  estimateInMinutes: number;
   name?: string;
   partyID?: string;
+  nextPartyID?: string;
+  estimateInMinutes: number;
 };
 
 export const StatusComponent = ({
   state,
-  estimateInMinutes,
   name,
   partyID,
+  nextPartyID,
+  estimateInMinutes,
 }: StatusComponentProps) => {
   return (
     <Box
@@ -24,62 +26,67 @@ export const StatusComponent = ({
         justifyContent: 'center',
       }}
     >
-      {/* Deal with the states in order, rather than complex nested logic */}
-      {/* If in queue, we show the queue text, and the estimate below */}
       {state === 'inQueue' && (
         <>
-          {/* Add party ID as a subtle top right position flag for debugging */}
+          {/* Greeting */}
           <Typography
-            variant="body2"
+            variant="h4"
             component="p"
-            sx={{
-              position: 'absolute',
-              top: 0,
-              right: 0,
-              marginTop: 2,
-              marginRight: 2,
-            }}
+            sx={{ marginTop: 2, textAlign: 'center' }}
           >
-            {`Party ID: ${partyID}`}
+            {`You're in the queue, ${name}`}
           </Typography>
+
+          {/* Queue position info */}
           <Typography
             variant="h3"
             component="p"
             sx={{ marginTop: 2, textAlign: 'center' }}
           >
-            {`Welcome, ${name}`}
+            {partyID}
+          </Typography>
+          <Typography
+            variant="h5"
+            component="p"
+            sx={{ marginTop: 4, textAlign: 'center' }}
+          >
+            We are currently seating Queue Number: {nextPartyID}
           </Typography>
         </>
       )}
 
-      {/* If ready to check in, prompt the user */}
       {state === 'readyToCheckIn' && (
         <>
-          {/* Show the user their table is ready */}
           <Typography
             variant="h3"
             component="p"
             sx={{ marginTop: 2, textAlign: 'center' }}
           >
-            {`Your table is ready, ${name}`}
+            Your table is ready, {name}
           </Typography>
           <Typography
             variant="h4"
             component="p"
             sx={{ marginTop: 2, textAlign: 'center' }}
           >
-            {`Show this to the host, ${partyID}`}
+            Show this to the host:
+          </Typography>
+          <Typography
+            variant="h2"
+            component="p"
+            sx={{ marginTop: 8, textAlign: 'center' }}
+          >
+            {partyID}
           </Typography>
         </>
       )}
 
-      {/* If user is not about to be checked in, we always show the estimate */}
+      {/* Wait estimate always shown unless table is ready */}
       {state !== 'readyToCheckIn' && (
-        <Typography variant="h4" component="p" sx={{ marginTop: 2 }}>
-          {/* estimate should never be negative, but just in case it is lets make it 0 if negative */}
-          {estimateInMinutes > 0
-            ? `${estimateInMinutes} minute wait`
-            : '0 minute wait'}
+        <Typography variant="h5" component="p" sx={{ marginTop: 2 }}>
+          {estimateInMinutes <= 0
+            ? 'No wait'
+            : `${estimateInMinutes} minute wait...`}
         </Typography>
       )}
     </Box>

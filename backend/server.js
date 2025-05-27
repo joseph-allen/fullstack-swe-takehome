@@ -16,12 +16,17 @@ app.use("/parties", partyRoutes);
 
 app.get("/ping-db", async (req, res) => {
   try {
-    const admin = req.app.locals.db?.admin?.();
-    const info = await admin.ping();
-    res.json({ status: "MongoDB is alive", info });
+    // ping to check alive
+    const db = req.app.locals.db;
+    if (!db) throw new Error("Database not connected yet");
+
+    // Query documents inside 'system' collection, not just listing collections
+    const systemData = await db.collection("system").find({}).toArray();
+
+    res.json({ status: "MongoDB is alive", system: systemData });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Failed to ping MongoDB" });
+    res.status(500).json({ error: "Failed to retrieve system data" });
   }
 });
 

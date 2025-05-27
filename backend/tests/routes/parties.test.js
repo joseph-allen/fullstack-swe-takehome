@@ -4,13 +4,28 @@ const partiesRouter = require("../../routes/parties"); // adjust path if needed
 const Party = require("../../models/Party");
 const getNextPartyID = require("../../helpers/getNextPartyID");
 
-// Create an Express app with your router mounted
-const app = express();
-app.use(express.json());
-app.use("/parties", partiesRouter);
+// Mock mongoose connection and db collection for PATCH route
+const mongoose = require("mongoose");
 
 jest.mock("../../models/Party");
 jest.mock("../../helpers/getNextPartyID");
+
+// Mock collection for 'system' used in patch route
+const mockSystemCollection = {
+  findOne: jest.fn(),
+  updateOne: jest.fn(),
+};
+
+// Mock mongoose connection db collection method
+mongoose.connection = {
+  db: {
+    collection: jest.fn(() => mockSystemCollection),
+  },
+};
+
+const app = express();
+app.use(express.json());
+app.use("/parties", partiesRouter);
 
 describe("Parties routes", () => {
   beforeEach(() => {
@@ -22,7 +37,6 @@ describe("Parties routes", () => {
       const fakeParties = [
         { uuid: "1", name: "Party A", size: 10, _id: "mongoid1" },
       ];
-      // Mock Party.find() to resolve with fakeParties
       Party.find.mockResolvedValue(fakeParties);
 
       const response = await request(app).get("/parties");
@@ -51,12 +65,12 @@ describe("Parties routes", () => {
       const newParty = { uuid: "abc", name: "Test Party", size: 5 };
       getNextPartyID.mockResolvedValue("042");
 
-      // Mock Party constructor to return an object with save method
       Party.mockImplementation(function (data) {
         this.uuid = data.uuid;
         this.name = data.name;
         this.size = data.size;
         this.createdAt = data.createdAt;
+        this.status = data.status;
         this.partyID = data.partyID;
         this.save = jest.fn().mockResolvedValue(this);
       });
@@ -70,9 +84,9 @@ describe("Parties routes", () => {
       expect(Party).toHaveBeenCalledWith({
         ...newParty,
         createdAt: expect.any(Date),
+        status: "waiting",
         partyID: "042",
       });
-      // Ensure save was called
       expect(Party.mock.instances[0].save).toHaveBeenCalled();
     });
 
@@ -90,7 +104,6 @@ describe("Parties routes", () => {
     });
 
     it("should return 500 on DB failure", async () => {
-      // missing a required field to trigger error
       const party = { uuid: "test-uuid", name: "Test Party", size: 5 };
       getNextPartyID.mockResolvedValue("999");
 
@@ -106,6 +119,52 @@ describe("Parties routes", () => {
 
     afterAll(() => {
       consoleErrorSpy.mockRestore();
+    });
+  });
+
+  describe("PATCH /parties/:uuid", () => {
+    it("returns 400 if newStatus is missing or invalid", async () => {
+      const res = await request(app).patch("/parties/test-uuid").send({}); // no newStatus
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body).toEqual({ error: "Invalid or missing newStatus" });
+
+      const resInvalid = await request(app)
+        .patch("/parties/test-uuid")
+        .send({ newStatus: "invalid" });
+
+      expect(resInvalid.statusCode).toBe(400);
+      expect(resInvalid.body).toEqual({
+        error: "Invalid or missing newStatus",
+      });
+    });
+
+    it("returns 404 if party not found", async () => {
+      Party.findOne.mockResolvedValue(null);
+
+      const res = await request(app)
+        .patch("/parties/nonexistent-uuid")
+        .send({ newStatus: "seated" });
+
+      expect(res.statusCode).toBe(404);
+      expect(res.body).toEqual({ error: "Party not found" });
+      expect(Party.findOne).toHaveBeenCalledWith({ uuid: "nonexistent-uuid" });
+    });
+
+    it("returns 400 on invalid status transition", async () => {
+      // party status is 'waiting', but try to transition directly to 'done'
+      Party.findOne.mockResolvedValue({
+        uuid: "test-uuid",
+        status: "waiting",
+        size: 2,
+      });
+
+      const res = await request(app)
+        .patch("/parties/test-uuid")
+        .send({ newStatus: "done" });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.error).toMatch(/Invalid status transition/);
     });
   });
 });

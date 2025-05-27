@@ -8,11 +8,13 @@ const fetchPing = async () => {
   return res.json();
 };
 
+// run every three seconds, in line with our simulator
 export function usePingDB() {
   return useQuery({
     queryKey: ['ping'],
     queryFn: fetchPing,
-    staleTime: 10 * 1000,
+    staleTime: 3 * 1000,
     retry: 1,
+    refetchInterval: 3 * 1000,
   });
 }

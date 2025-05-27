@@ -12,64 +12,64 @@ async function getNextPartyID(db) {
       { upsert: true, returnDocument: "after" }
     );
 
-  // For padded strings
-  const padded = String(result.seq).padStart(3, "0");
-  return padded;
+  return String(result.seq).padStart(3, "0");
 }
 
 async function main() {
   await client.connect();
   const db = client.db("my-db");
 
-  // Ensure collections exist
   await db.createCollection("parties").catch(() => {});
   await db.createCollection("system").catch(() => {});
   await db.createCollection("counters").catch(() => {});
 
-  // Set up system singleton
-  await db.collection("system").updateOne(
-    { _id: "singleton" },
-    {
-      $setOnInsert: {
-        totalSeats: 10,
-        availableSeats: 10,
-      },
-    },
-    { upsert: true }
-  );
-
-  // Clear previous parties
   await db.collection("parties").deleteMany({});
-
-  // Reset counter
   await db
     .collection("counters")
     .updateOne({ _id: "partyID" }, { $set: { seq: 0 } }, { upsert: true });
 
-  // Insert sample data
+  const TOTAL_SEATS = 10;
+
   const parties = [
     {
       uuid: "uuid-1",
       name: "Alice",
-      size: 2,
-      status: "waiting",
+      size: 1,
+      status: "seated",
       createdAt: new Date(),
+      seatedAt: new Date(),
     },
     {
       uuid: "uuid-2",
       name: "Bob",
-      size: 4,
+      size: 5,
       status: "seated",
       createdAt: new Date(Date.now() - 10 * 60 * 1000),
-      seatedAt: new Date(Date.now() - 5 * 60 * 1000),
+      seatedAt: new Date(),
     },
     {
       uuid: "uuid-3",
       name: "Charlie",
-      size: 2,
-      status: "done",
+      size: 1,
+      status: "seated",
       createdAt: new Date(Date.now() - 30 * 60 * 1000),
-      seatedAt: new Date(Date.now() - 27 * 60 * 1000),
+      seatedAt: new Date(),
+    },
+    {
+      uuid: "uuid-4",
+      name: "Dana",
+      size: 2,
+      status: "waiting",
+      createdAt: new Date(Date.now() - 60 * 60 * 1000),
+      seatedAt: null,
+    },
+    {
+      uuid: "uuid-5",
+      name: "Eli",
+      size: 4,
+      status: "waiting",
+      createdAt: new Date(Date.now() - 30 * 60 * 1000),
+      seatedAt: null,
     },
   ];
 
@@ -77,6 +77,40 @@ async function main() {
     party.partyID = await getNextPartyID(db);
     await db.collection("parties").insertOne(party);
   }
+
+  const seatedParties = await db
+    .collection("parties")
+    .find({ status: "seated" })
+    .toArray();
+  const occupiedSeats = seatedParties.reduce(
+    (sum, p) => sum + (p.size || 0),
+    0
+  );
+  const availableSeats = TOTAL_SEATS - occupiedSeats;
+
+  // Find the next party to be seated
+  const nextParty = await db
+    .collection("parties")
+    .find({ status: "waiting", size: { $lte: availableSeats } })
+    .sort({ createdAt: 1, partyID: -1 }) // oldest first, break ties by higher ID
+    .limit(1)
+    .next();
+
+  const nextPartyId = nextParty?.partyID || null;
+  const nextPartySize = nextParty?.size || null;
+
+  await db.collection("system").updateOne(
+    { _id: "singleton" },
+    {
+      $set: {
+        totalSeats: TOTAL_SEATS,
+        availableSeats,
+        nextPartyId,
+        nextPartySize,
+      },
+    },
+    { upsert: true }
+  );
 
   await client.close();
 }
