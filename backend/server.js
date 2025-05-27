@@ -21,9 +21,6 @@ app.get("/ping-db", async (req, res) => {
     const db = req.app.locals.db;
     if (!db) throw new Error("Database not connected yet");
 
-    const collections = await db.listCollections().toArray();
-    console.log(collections.map((c) => c.name)); // Log actual collection names
-
     // Query documents inside 'system' collection, not just listing collections
     const systemData = await db.collection("system").find({}).toArray();
 

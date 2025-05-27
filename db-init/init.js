@@ -37,6 +37,7 @@ async function main() {
       size: 1,
       status: "seated",
       createdAt: new Date(),
+      seatedAt: new Date(),
     },
     {
       uuid: "uuid-2",

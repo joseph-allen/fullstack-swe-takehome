@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   Drawer,
   Typography,
@@ -12,47 +12,28 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import { useUUID } from '@/context/UUIDContext';
 import { usePingDB } from '@/hooks/usePingDB';
+import renderSeats from '@/helpers/renderSeats';
 
 type DevPanelProps = {
   joinedPartyID: string;
   patchError: unknown;
+  totalSeats: number;
+  availableSeats: number | null;
+  nextPartyId: string;
+  nextPartySize: number | null;
 };
 
-export default function DevPanel({ joinedPartyID, patchError }: DevPanelProps) {
+export default function DevPanel({
+  joinedPartyID,
+  patchError,
+  totalSeats,
+  availableSeats,
+  nextPartyId,
+  nextPartySize,
+}: DevPanelProps) {
   const { uuid, removeUUID } = useUUID();
   const { data, error, isLoading } = usePingDB();
   const [open, setOpen] = useState(true);
-  const [totalSeats, setTotalSeats] = useState<number>(0);
-  const [availableSeats, setAvailableSeats] = useState<number | null>(null);
-  const [nextPartyId, setNextPartyId] = useState<string>('000');
-  const [nextPartySize, setNextPartySize] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (data?.system?.[0]) {
-      setTotalSeats(data.system[0].totalSeats);
-      setAvailableSeats(data.system[0].availableSeats);
-      setNextPartyId(data.system[0].nextPartyId ?? '000');
-      setNextPartySize(data.system[0].nextPartySize);
-    }
-  }, [data]);
-
-  function renderSeats(total: number, available: number, partySize: number) {
-    const filled = total - available;
-    const numParty = Math.min(partySize, filled);
-    const numOther = filled - numParty;
-
-    let seatStr = '';
-    for (let i = 0; i < total; i++) {
-      if (i < numParty) {
-        seatStr += '🟢'; // matrix green square for "current party"
-      } else if (i < numParty + numOther) {
-        seatStr += '🟩'; // other seated parties
-      } else {
-        seatStr += '⬛'; // empty seat
-      }
-    }
-    return seatStr;
-  }
 
   const canSeatNextParty =
     availableSeats !== null &&
@@ -74,7 +55,7 @@ export default function DevPanel({ joinedPartyID, patchError }: DevPanelProps) {
             bgcolor: '#00FF00',
             color: '#000',
             fontFamily: 'Courier New, monospace',
-            zIndex: 1300, // above MUI drawer
+            zIndex: 1300,
             '&:hover': {
               bgcolor: '#00CC00',
             },
@@ -89,12 +70,14 @@ export default function DevPanel({ joinedPartyID, patchError }: DevPanelProps) {
         anchor="left"
         open={open}
         variant="persistent"
-        PaperProps={{
-          sx: {
-            bgcolor: '#000000',
-            color: '#00FF00',
-            fontFamily: 'Courier New, monospace',
-            width: 320,
+        slotProps={{
+          paper: {
+            sx: {
+              bgcolor: '#000',
+              color: '#00FF00',
+              fontFamily: 'Courier New, monospace',
+              width: 320,
+            },
           },
         }}
       >
@@ -144,13 +127,14 @@ export default function DevPanel({ joinedPartyID, patchError }: DevPanelProps) {
               Ping: <code>awaiting response...</code>
             </Typography>
           )}
+
           {error && (
             <Typography color="error" mt={2}>
               Backend error: <code>{(error as Error).message}</code>
             </Typography>
           )}
 
-          {data && data.system?.[0] && (
+          {data?.system?.[0] && (
             <Box mt={2}>
               <Typography>✔ Backend Status: ONLINE</Typography>
               <Typography>
@@ -166,14 +150,27 @@ export default function DevPanel({ joinedPartyID, patchError }: DevPanelProps) {
                 Next Party Size: <code>{nextPartySize ?? '?'}</code>
               </Typography>
               <Typography>
-                Can seat next party?
-                <code>{canSeatNextParty ? ' YES' : ' NO'}</code>
+                Can seat next party?{' '}
+                <code>{canSeatNextParty ? 'YES' : 'NO'}</code>
               </Typography>
               <Typography>
-                Are you next party?
-                <code>{isUserNextParty ? ' YES' : ' NO'}</code>
+                Are you next party?{' '}
+                <code>{isUserNextParty ? 'YES' : 'NO'}</code>
               </Typography>
 
+              <Box fontSize={14} mt={1}>
+                <Typography>
+                  <code>🟢</code> = Your party
+                </Typography>
+                <Typography>
+                  <code>🟩</code> = Other parties
+                </Typography>
+                <Typography>
+                  <code>⬛</code> = Empty
+                </Typography>
+              </Box>
+
+              {/* TODO: nextPartySize is always assuming 2 */}
               <Box mt={1} fontSize={20} fontFamily="Courier New, monospace">
                 Seats: <br />
                 {renderSeats(

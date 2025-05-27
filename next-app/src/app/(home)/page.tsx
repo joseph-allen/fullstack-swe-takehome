@@ -1,17 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Confetti from 'react-confetti-boom';
+import { Box, Button, Divider, Typography } from '@mui/material';
+
+import DevPanel from '@/components/DevPanel';
 import StatusComponent from '@/components/StatusComponent';
 import TableForm from '@/components/TableForm';
 import LoadingComponent from '@/components/LoadingComponent';
+
 import { useAppMachine } from '@/hooks/useAppMachine';
 import { useUpdatePartyStatus } from '@/hooks/useUpdatePartyStatus';
 import { useJoinQueueMutation } from '@/hooks/useJoinQueueMutation';
+import { usePingDB } from '@/hooks/usePingDB';
 import { useUUID } from '@/context/UUIDContext';
-import { Typography, Divider, Button, Box } from '@mui/material';
-import DevPanel from '@/components/DevPanel';
-// import { usePingDB } from '@/hooks/usePingDB';
 
 type AppState =
   | 'idle'
@@ -32,10 +34,15 @@ export default function HomePage() {
   } = useAppMachine();
 
   const { uuid, removeUUID, resetUUID } = useUUID();
-
   const current = currentState as AppState;
 
-  // const { data } = usePingDB();
+  const { data: pingData } = usePingDB();
+
+  const [totalSeats, setTotalSeats] = useState(0);
+  const [availableSeats, setAvailableSeats] = useState<number | null>(null);
+  const [nextPartyId, setNextPartyId] = useState('000');
+  const [nextPartySize, setNextPartySize] = useState<number | null>(null);
+  const [joinedPartyID, setJoinedPartyID] = useState<string>('000');
 
   const {
     updatePartyStatus,
@@ -43,27 +50,41 @@ export default function HomePage() {
     error: patchError,
   } = useUpdatePartyStatus();
 
-  const [joinedPartyID, setJoinedPartyID] = useState<string>('000');
-  // const [totalSeats, setTotalSeats] = useState<number>(10);
-  // const [availableSeats, setAvailableSeats] = useState<number | null>(null);
+  useEffect(() => {
+    if (pingData?.system?.[0]) {
+      const system = pingData.system[0];
+      setTotalSeats(system.totalSeats);
+      setAvailableSeats(system.availableSeats);
+      setNextPartyId(system.nextPartyId);
+      setNextPartySize(system.nextPartySize);
+    }
+  }, [pingData]);
 
   const mutation = useJoinQueueMutation((data) => {
     setJoinedPartyID(data.id);
     queueJoined();
   });
 
-  // Update state whenever data changes
-  // useEffect(() => {
-  //   if (data?.system?.[0]) {
-  //     setTotalSeats(data.system[0].totalSeats);
-  //     setAvailableSeats(data.system[0].availableSeats);
-  //   }
-  // }, [data]);
+  const handleStatusUpdate = (status: 'seated' | 'done') => {
+    if (uuid) updatePartyStatus(uuid, status);
+  };
+
+  const resetAll = () => {
+    reset();
+    removeUUID();
+    resetUUID();
+  };
 
   return (
     <>
-      {/* Check DB Connection */}
-      <DevPanel joinedPartyID={joinedPartyID} patchError={patchError} />
+      <DevPanel
+        joinedPartyID={joinedPartyID}
+        patchError={patchError}
+        totalSeats={totalSeats}
+        availableSeats={availableSeats}
+        nextPartyId={nextPartyId}
+        nextPartySize={nextPartySize}
+      />
 
       {current === 'formSubmitted' ? (
         <Box textAlign="center" mt={4}>
@@ -86,14 +107,12 @@ export default function HomePage() {
         </Box>
       ) : (
         <>
-          <div>
-            <StatusComponent
-              state={current}
-              estimateInMinutes={45}
-              name="The Smiths"
-              partyID={joinedPartyID}
-            />
-          </div>
+          <StatusComponent
+            state={current}
+            estimateInMinutes={45}
+            name="The Smiths"
+            partyID={joinedPartyID}
+          />
 
           {current === 'readyToCheckIn' && uuid && (
             <Box mt={2} display="flex" gap={2} justifyContent="center">
@@ -108,11 +127,12 @@ export default function HomePage() {
                     bgcolor: '#00CC00',
                   },
                 }}
-                onClick={() => updatePartyStatus(uuid, 'seated')}
+                onClick={() => handleStatusUpdate('seated')}
                 disabled={patchLoading}
               >
                 Mark as Seated
               </Button>
+
               <Button
                 variant="contained"
                 size="small"
@@ -124,12 +144,12 @@ export default function HomePage() {
                     bgcolor: '#00CC00',
                   },
                 }}
-                onClick={() => updatePartyStatus(uuid, 'done')}
+                onClick={() => handleStatusUpdate('done')}
                 disabled={patchLoading}
               >
                 Mark as Done
               </Button>
-              {/* dev button reset */}
+
               <Button
                 variant="contained"
                 size="small"
@@ -141,28 +161,21 @@ export default function HomePage() {
                     bgcolor: '#00CC00',
                   },
                 }}
-                onClick={() => {
-                  reset();
-                  removeUUID();
-                  resetUUID();
-                }}
+                onClick={resetAll}
               >
                 Reset
               </Button>
             </Box>
           )}
 
-          {current !== 'readyToCheckIn' && <Divider flexItem />}
+          {current !== 'readyToCheckIn' && <Divider flexItem sx={{ my: 4 }} />}
 
-          <div
-            style={{
-              display: 'flex',
-              height: '100%',
-              width: '100%',
-              flexDirection: 'column',
-              gap: '32px',
-              alignItems: 'center',
-            }}
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            gap={4}
+            width="100%"
           >
             {current === 'idle' && (
               <>
@@ -193,7 +206,7 @@ export default function HomePage() {
             {current === 'inQueue' && (
               <>
                 <LoadingComponent text="You're in the queue" withDots />
-                <div style={{ display: 'flex', gap: 32 }}>
+                <Box display="flex" gap={4} alignItems="center">
                   <Typography variant="h5">Change your mind?</Typography>
                   <Button
                     variant="outlined"
@@ -202,7 +215,7 @@ export default function HomePage() {
                   >
                     Leave Queue
                   </Button>
-                </div>
+                </Box>
                 <Button
                   variant="contained"
                   size="small"
@@ -231,7 +244,7 @@ export default function HomePage() {
                 y={0.8}
               />
             )}
-          </div>
+          </Box>
         </>
       )}
     </>

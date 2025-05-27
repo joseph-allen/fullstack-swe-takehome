@@ -5,6 +5,7 @@ const partySchema = new mongoose.Schema({
   name: { type: String, required: true },
   size: { type: Number, required: true },
   createdAt: { type: Date, default: Date.now },
+  seatedAt: Date,
   partyID: { type: String, default: "000" },
   status: {
     type: String,
