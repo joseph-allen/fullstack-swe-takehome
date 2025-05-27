@@ -65,21 +65,6 @@ export default function HomePage() {
   }
 
   useEffect(() => {
-    if (!uuid) {
-      console.log('No UUID, skipping fetch');
-      return;
-    }
-
-    async function fetchParty() {
-      console.log('Fetching party for UUID:', uuid);
-      // ...
-    }
-
-    fetchParty();
-  }, [uuid]);
-
-  useEffect(() => {
-    console.log('party in DB');
     if (party && !partyLoading && !partyError) {
       if (party.status === 'waiting') {
         forceInQueue();
