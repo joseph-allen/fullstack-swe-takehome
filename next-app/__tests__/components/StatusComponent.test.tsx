@@ -15,7 +15,7 @@ describe('StatusComponent', () => {
 
   it('renders wait time as-is even if negative', () => {
     render(<Status state="idle" estimateInMinutes={-2} />);
-    expect(screen.getByText('-2 minute wait...')).toBeInTheDocument();
+    expect(screen.getByText('No wait')).toBeInTheDocument();
   });
 
   it('renders party ID in queue state', () => {

@@ -77,7 +77,9 @@ export const StatusComponent = ({
       {/* Wait estimate always shown unless table is ready */}
       {state !== 'readyToCheckIn' && (
         <Typography variant="h5" component="p" sx={{ marginTop: 2 }}>
-          {`${estimateInMinutes} minute wait...`}
+          {estimateInMinutes <= 0
+            ? 'No wait'
+            : `${estimateInMinutes} minute wait...`}
         </Typography>
       )}
     </Box>
