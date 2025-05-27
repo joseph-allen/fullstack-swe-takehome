@@ -38,6 +38,52 @@ router.get("/", async (req, res) => {
 
 /**
  * @swagger
+ * /parties/{uuid}:
+ *   get:
+ *     summary: Get a party by UUID
+ *     tags: [Parties]
+ *     parameters:
+ *       - in: path
+ *         name: uuid
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: UUID of the party to retrieve
+ *     responses:
+ *       200:
+ *         description: Party data retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Party'
+ *       404:
+ *         description: Party not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Party not found
+ */
+router.get("/:uuid", async (req, res) => {
+  const { uuid } = req.params;
+  try {
+    const party = await Party.findOne({ uuid });
+
+    if (!party) {
+      return res.status(404).json({ error: "Party not found" });
+    }
+    res.status(200).json(party);
+  } catch (error) {
+    console.error("Error fetching party:", error);
+    res.status(500).json({ error: "Failed to fetch party" });
+  }
+});
+
+/**
+ * @swagger
  * /parties:
  *   post:
  *     summary: Create a new party

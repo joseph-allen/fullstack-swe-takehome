@@ -5,7 +5,11 @@ export const appMachine = createMachine({
   initial: 'idle',
   states: {
     idle: {
-      on: { JOIN_CLICKED: 'showForm' },
+      on: {
+        JOIN_CLICKED: 'showForm',
+        FORCE_INQUEUE: 'inQueue',
+        FORCE_READY: 'readyToCheckIn',
+      },
     },
     showForm: {
       on: { SUBMIT: 'formSubmitted' },

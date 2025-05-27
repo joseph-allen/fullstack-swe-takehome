@@ -35,12 +35,15 @@ describe('PATCH handler', () => {
     // Mock global fetch
     global.fetch = jest.fn().mockResolvedValue({
       status: 200,
-      json: jest
+      ok: true,
+      text: jest
         .fn()
-        .mockResolvedValue({ message: 'Party updated', status: 'seated' }),
+        .mockResolvedValue(
+          JSON.stringify({ message: 'Party updated', status: 'seated' })
+        ),
     });
 
-    await PATCH(req, { params });
+    await PATCH(req as any, { params });
 
     expect(global.fetch).toHaveBeenCalledWith(
       `http://backend:4000/parties/${params.uuid}`,
@@ -53,7 +56,10 @@ describe('PATCH handler', () => {
 
     expect(NextResponse.json).toHaveBeenCalledWith(
       { message: 'Party updated', status: 'seated' },
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }
     );
   });
 
