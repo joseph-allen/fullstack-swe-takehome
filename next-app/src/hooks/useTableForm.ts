@@ -2,7 +2,7 @@ import { useForm, useController, useWatch } from 'react-hook-form';
 import { TableFormValues } from '@/types/tableForm';
 export const MAX_TABLE_SIZE = 8;
 
-// default partySize is 1, assumed most common table size but could be inferred from previous bookings
+// default size is 1, assumed most common table size but could be inferred from previous bookings
 export function useTableForm(customOnSubmit?: (data: TableFormValues) => void) {
   const {
     control,
@@ -13,17 +13,17 @@ export function useTableForm(customOnSubmit?: (data: TableFormValues) => void) {
   } = useForm<TableFormValues>({
     defaultValues: {
       name: '',
-      partySize: 1,
+      size: 1,
     },
   });
 
-  // useController hook to manage partySize, I don't need to rewrite validation rules in TableForm
+  // useController hook to manage size, I don't need to rewrite validation rules in TableForm
   // connect a specific form field to React hook forms internal form state and validation
   const {
-    field: rawPartySizeField,
-    fieldState: { error: partySizeError },
+    field: rawsizeField,
+    fieldState: { error: sizeError },
   } = useController({
-    name: 'partySize',
+    name: 'size',
     control,
     rules: {
       required: 'Party size is required',
@@ -33,25 +33,25 @@ export function useTableForm(customOnSubmit?: (data: TableFormValues) => void) {
   });
 
   // Number input allows text input - good, but can otherwise be changed far beyond 8
-  const partySizeField = {
-    ...rawPartySizeField,
+  const sizeField = {
+    ...rawsizeField,
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = Number(e.target.value);
       const clamped = Math.max(1, Math.min(MAX_TABLE_SIZE, value));
-      rawPartySizeField.onChange(clamped);
+      rawsizeField.onChange(clamped);
     },
   };
 
   // subscribe to changes on field, tests found that multiple rapid increments didn't re-render
-  const partySize = useWatch({ control, name: 'partySize' });
+  const size = useWatch({ control, name: 'size' });
 
   // increment never above the largest table the resturant offers.
   const increment = () => {
-    setValue('partySize', Math.min(MAX_TABLE_SIZE, partySize + 1));
+    setValue('size', Math.min(MAX_TABLE_SIZE, size + 1));
   };
 
   const decrement = () => {
-    setValue('partySize', Math.max(1, partySize - 1));
+    setValue('size', Math.max(1, size - 1));
   };
 
   // temporary support for a custom onSubmit
@@ -70,8 +70,8 @@ export function useTableForm(customOnSubmit?: (data: TableFormValues) => void) {
     errors,
     increment,
     decrement,
-    partySize,
-    partySizeField,
-    partySizeError,
+    size,
+    sizeField,
+    sizeError,
   };
 }

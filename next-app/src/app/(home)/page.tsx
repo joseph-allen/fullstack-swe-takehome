@@ -5,9 +5,11 @@ import Confetti from 'react-confetti-boom';
 import StatusComponent from '@/components/StatusComponent';
 import TableForm from '@/components/TableForm';
 import LoadingComponent from '@/components/LoadingComponent';
-import UUIDComponent from '@/components/UUIDComponent';
 import { useAppMachine } from '@/hooks/useAppMachine';
 import { usePingDB } from '@/hooks/usePingDB';
+import { useJoinQueueMutation } from '@/hooks/useJoinQueueMutation';
+import { useUUID } from '@/context/UUIDContext';
+import { useState } from 'react';
 
 type AppState =
   | 'idle'
@@ -27,14 +29,28 @@ export default function HomePage() {
     reset,
   } = useAppMachine();
 
+  const { uuid, removeUUID } = useUUID();
   const current = currentState as AppState;
   const { data, error, isLoading } = usePingDB();
+  const [joinedPartyID, setJoinedPartyID] = useState<string>('000');
+
+  const mutation = useJoinQueueMutation((data) => {
+    setJoinedPartyID(data.id);
+    queueJoined();
+  });
 
   return (
     <>
-      {/* Set UUID   */}
+      {/* Check DB Connection   */}
       <div style={{ position: 'absolute', top: 0, left: 0 }}>
-        <UUIDComponent />
+        {!uuid ? (
+          <p>Loading UUID...</p>
+        ) : (
+          <>
+            <p>Your UUID: {uuid}</p>
+            <button onClick={removeUUID}>Clear UUID</button>
+          </>
+        )}
         {/* Display backend/MongoDB connection status */}
         {isLoading && <Typography>Checking backend connection...</Typography>}
         {error && (
@@ -43,6 +59,11 @@ export default function HomePage() {
           </Typography>
         )}
         {data && <Typography color="success.main">Backend OK</Typography>}
+        {joinedPartyID && (
+          <Typography>
+            Assigned partyID: <strong>{joinedPartyID}</strong>
+          </Typography>
+        )}
       </div>
 
       {current === 'formSubmitted' ? (
@@ -64,7 +85,7 @@ export default function HomePage() {
               state={current}
               estimateInMinutes={45}
               name="The Smiths"
-              partyID={123}
+              partyID={joinedPartyID}
             />
           </div>
 
@@ -101,12 +122,24 @@ export default function HomePage() {
               </>
             )}
 
+            {/* Pass in UUID here */}
             {current === 'showForm' && (
               <TableForm
-                onSubmit={() => {
-                  console.log('submit');
+                onSubmit={(data) => {
+                  const payload = {
+                    uuid,
+                    name: data.name,
+                    size: data.size,
+                    status: 'waiting',
+                  };
+
+                  // Move to formSubmitted state immediately
                   submitForm();
+
+                  // Fire the mutation
+                  mutation.mutate(payload);
                 }}
+                isLoading={mutation.status === 'pending'}
               />
             )}
 

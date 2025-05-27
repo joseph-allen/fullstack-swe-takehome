@@ -51,6 +51,6 @@ export const Loading: Story = {
     state: 'idle',
     estimateInMinutes: 25,
     name: 'The Smiths',
-    partyID: 123,
+    partyID: '123',
   },
 };

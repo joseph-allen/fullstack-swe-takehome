@@ -6,7 +6,7 @@ type StatusComponentProps = {
   state: 'idle' | 'showForm' | 'formSubmitted' | 'inQueue' | 'readyToCheckIn';
   estimateInMinutes: number;
   name?: string;
-  partyID?: number;
+  partyID?: string;
 };
 
 export const StatusComponent = ({

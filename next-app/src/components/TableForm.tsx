@@ -15,7 +15,8 @@ import { TableFormValues } from '@/types/tableForm';
 
 export const TableForm: React.FC<{
   onSubmit?: (data: TableFormValues) => void;
-}> = ({ onSubmit }) => {
+  isLoading?: boolean;
+}> = ({ onSubmit, isLoading }) => {
   const {
     register,
     handleSubmit,
@@ -23,9 +24,9 @@ export const TableForm: React.FC<{
     errors,
     increment,
     decrement,
-    partySize,
-    partySizeField,
-    partySizeError,
+    size,
+    sizeField,
+    sizeError,
   } = useTableForm(onSubmit);
 
   return (
@@ -54,7 +55,7 @@ export const TableForm: React.FC<{
               <Typography variant="h5">Party size:</Typography>
               <IconButton
                 onClick={decrement}
-                disabled={partySize <= 1}
+                disabled={size <= 1}
                 aria-label="Decrease"
               >
                 <Remove />
@@ -65,15 +66,15 @@ export const TableForm: React.FC<{
                 data-testid="party-input"
                 aria-label="party-input"
                 type="number"
-                {...partySizeField}
-                error={!!partySizeError}
-                helperText={partySizeError?.message}
+                {...sizeField}
+                error={!!sizeError}
+                helperText={sizeError?.message}
                 sx={{ width: 80 }}
               />
 
               <IconButton
                 onClick={increment}
-                disabled={partySize >= MAX_TABLE_SIZE}
+                disabled={size >= MAX_TABLE_SIZE}
                 aria-label="Increase"
               >
                 <Add />
@@ -82,7 +83,7 @@ export const TableForm: React.FC<{
           </Box>
 
           <Box minHeight="48px" textAlign="center">
-            {partySize >= MAX_TABLE_SIZE && (
+            {size >= MAX_TABLE_SIZE && (
               <Alert severity="warning">
                 <Typography variant="body2">
                   For parties larger than {MAX_TABLE_SIZE}, please speak to the
@@ -100,7 +101,7 @@ export const TableForm: React.FC<{
             gap={1}
             justifyContent="center"
           >
-            {Array.from({ length: partySize }, (_, i) => (
+            {Array.from({ length: size }, (_, i) => (
               <Image
                 key={i}
                 src="/person.apng"
@@ -120,8 +121,13 @@ export const TableForm: React.FC<{
             ))}
           </Box>
 
-          <Button type="submit" variant="contained" fullWidth>
-            Submit
+          <Button
+            type="submit"
+            variant="contained"
+            fullWidth
+            disabled={isLoading}
+          >
+            {isLoading ? 'Submitting...' : 'Submit'}
           </Button>
         </Stack>
       </form>
