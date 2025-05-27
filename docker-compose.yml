@@ -1,17 +1,18 @@
+version: "3.8"
 services:
   app:
     build:
-      context: ./next-app # Set build context to next-app directory
-      dockerfile: Dockerfile # Specify Dockerfile location within next-app
+      context: ./next-app
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     volumes:
-      - ./next-app:/app # Mount next-app directory to /app in container
+      - ./next-app:/app
     environment:
-      - MONGODB_URI=mongodb://root:example@mongodb:27017
-      - BACKEND_URL=http://backend:4000
+      - MONGODB_URI=${MONGODB_URI}
+      - BACKEND_URL=${BACKEND_URL}
     depends_on:
-      - backend # Ensure backend service is started before app
+      - backend
       - mongodb
 
   backend:
@@ -21,7 +22,7 @@ services:
     ports:
       - "4000:4000"
     environment:
-      - MONGODB_URI=mongodb://root:example@mongodb:27017
+      - MONGODB_URI=${MONGODB_URI}
     depends_on:
       - mongodb
       - db-init
@@ -29,8 +30,8 @@ services:
   mongodb:
     image: mongo
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=example
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
     ports:
       - "27017:27017"
 
@@ -39,6 +40,6 @@ services:
       context: ./db-init
       dockerfile: Dockerfile
     environment:
-      - MONGODB_URI=mongodb://root:example@mongodb:27017
+      - MONGODB_URI=${MONGODB_URI}
     depends_on:
       - mongodb

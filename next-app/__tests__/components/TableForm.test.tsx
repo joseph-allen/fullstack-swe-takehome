@@ -20,10 +20,8 @@ describe('TableForm', () => {
 
   it('shows default party size', () => {
     render(<TableForm />);
-    const partySizeInput = screen
-      .getByTestId('party-input')
-      .querySelector('input');
-    expect(partySizeInput).toHaveValue(1);
+    const sizeInput = screen.getByTestId('party-input').querySelector('input');
+    expect(sizeInput).toHaveValue(1);
   });
 
   it('increments and decrements party size', () => {
@@ -32,18 +30,16 @@ describe('TableForm', () => {
     const decrementButton = screen.getByRole('button', {
       name: 'Decrease',
     });
-    const partySizeInput = screen
-      .getByTestId('party-input')
-      .querySelector('input');
+    const sizeInput = screen.getByTestId('party-input').querySelector('input');
 
     // Initial party size
-    expect(partySizeInput).toHaveValue(1);
+    expect(sizeInput).toHaveValue(1);
 
     fireEvent.click(incrementButton);
-    expect(partySizeInput).toHaveValue(2);
+    expect(sizeInput).toHaveValue(2);
 
     fireEvent.click(decrementButton);
-    expect(partySizeInput).toHaveValue(1);
+    expect(sizeInput).toHaveValue(1);
   });
 
   it('does not allow party size below 1 or above max', () => {
@@ -52,20 +48,18 @@ describe('TableForm', () => {
     const decrementButton = screen.getByRole('button', {
       name: 'Decrease',
     });
-    const partySizeInput = screen
-      .getByTestId('party-input')
-      .querySelector('input');
+    const sizeInput = screen.getByTestId('party-input').querySelector('input');
 
     // Decrement below 1 clamps at 1
     fireEvent.click(decrementButton);
     fireEvent.click(decrementButton);
     fireEvent.click(decrementButton);
-    expect(partySizeInput).toHaveValue(1);
+    expect(sizeInput).toHaveValue(1);
 
     // Increment above MAX_TABLE_SIZE clamps at MAX_TABLE_SIZE
     for (let i = 0; i < 10; i++) {
       fireEvent.click(incrementButton);
     }
-    expect(partySizeInput).toHaveValue(8); // Assuming MAX_TABLE_SIZE = 8
+    expect(sizeInput).toHaveValue(8); // Assuming MAX_TABLE_SIZE = 8
   });
 });

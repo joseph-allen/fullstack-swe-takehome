@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
+const mongoose = require("mongoose");
 const Party = require("../models/Party");
-
+const getNextPartyID = require("../helpers/getNextPartyID");
 /**
  * @swagger
  * tags:
@@ -89,15 +90,14 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    // TODO: migrate partyID logic from init script to here
-    // TODO: Add tests
-    // TODO: Some connections are adding to the default, test database
+    const partyID = await getNextPartyID(mongoose.connection.db);
+
     const newParty = new Party({
       uuid,
       name,
       size,
       createdAt: new Date(),
-      partyID: "101", // Default hardcoded for now
+      partyID,
     });
 
     const savedParty = await newParty.save();

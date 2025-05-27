@@ -9,7 +9,7 @@ import { useAppMachine } from '@/hooks/useAppMachine';
 import { usePingDB } from '@/hooks/usePingDB';
 import { useJoinQueueMutation } from '@/hooks/useJoinQueueMutation';
 import { useUUID } from '@/context/UUIDContext';
-import { useEffect } from 'react';
+import { useState } from 'react';
 
 type AppState =
   | 'idle'
@@ -32,16 +32,12 @@ export default function HomePage() {
   const { uuid, removeUUID } = useUUID();
   const current = currentState as AppState;
   const { data, error, isLoading } = usePingDB();
+  const [joinedPartyID, setJoinedPartyID] = useState<string>('000');
 
-  const mutation = useJoinQueueMutation(() => {
-    queueJoined(); // your callback for successful join
+  const mutation = useJoinQueueMutation((data) => {
+    setJoinedPartyID(data.id);
+    queueJoined();
   });
-
-  useEffect(() => {
-    if (mutation.isLoading) {
-      submitForm(); // move to 'formSubmitted' state
-    }
-  }, [mutation.isLoading, submitForm]);
 
   return (
     <>
@@ -63,6 +59,11 @@ export default function HomePage() {
           </Typography>
         )}
         {data && <Typography color="success.main">Backend OK</Typography>}
+        {joinedPartyID && (
+          <Typography>
+            Assigned partyID: <strong>{joinedPartyID}</strong>
+          </Typography>
+        )}
       </div>
 
       {current === 'formSubmitted' ? (
@@ -84,7 +85,7 @@ export default function HomePage() {
               state={current}
               estimateInMinutes={45}
               name="The Smiths"
-              partyID={123}
+              partyID={joinedPartyID}
             />
           </div>
 
@@ -128,12 +129,17 @@ export default function HomePage() {
                   const payload = {
                     uuid,
                     name: data.name,
-                    size: data.partySize, // these should match my API
+                    size: data.size,
                     status: 'waiting',
                   };
+
+                  // Move to formSubmitted state immediately
+                  submitForm();
+
+                  // Fire the mutation
                   mutation.mutate(payload);
                 }}
-                isLoading={mutation.isLoading}
+                isLoading={mutation.status === 'pending'}
               />
             )}
 

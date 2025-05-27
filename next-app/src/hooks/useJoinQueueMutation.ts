@@ -1,8 +1,15 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, UseMutationResult } from '@tanstack/react-query';
 import { TableFormValues } from '@/types/tableForm';
 
-export function useJoinQueueMutation(onSuccess?: () => void) {
-  return useMutation({
+type JoinQueueResponse = {
+  message: string;
+  id: string;
+};
+
+export function useJoinQueueMutation(
+  onSuccess?: (data: JoinQueueResponse) => void
+): UseMutationResult<JoinQueueResponse, Error, TableFormValues> {
+  return useMutation<JoinQueueResponse, Error, TableFormValues>({
     mutationFn: async (data: TableFormValues) => {
       const res = await fetch('/api/parties', {
         method: 'POST',
@@ -10,7 +17,7 @@ export function useJoinQueueMutation(onSuccess?: () => void) {
         body: JSON.stringify(data),
       });
       if (!res.ok) throw new Error('Failed to join queue');
-      return res.json();
+      return res.json() as Promise<JoinQueueResponse>;
     },
     onSuccess,
   });

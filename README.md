@@ -209,7 +209,7 @@ In the interest of keeping things short, but open to refactoring I have a notion
   _id: ObjectId(),
   partyId: "unique-uuid-string",
   name: "The Smiths",
-  partySize: 4,
+  size: 4,
   status: "WAITING", // WAITING, READY_TO_CHECK_IN, SERVING, COMPLETED
   joinedAt: ISODate(),
   serviceStartTime: null,
@@ -278,7 +278,7 @@ So the flow is as follows:
 3. Backend runs a loop every few seconds, processing the queue.
 
 - check all seated parties
-- now - seatedAt >= partySize x 3s, mark as done, and increase availableSeats += partySize
+- now - seatedAt >= size x 3s, mark as done, and increase availableSeats += size
 - While availableSeats allows - pop earliest waiting party and process.
 
 4. We assume customers are seated automatically and handled by the resturant, ending our flow. Users press a check-in button in their app, as required.
