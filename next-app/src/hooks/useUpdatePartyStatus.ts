@@ -1,9 +1,8 @@
-// hooks/useUpdatePartyStatus.ts
-
 import { useState } from 'react';
 
 type Status = 'seated' | 'done';
 
+// single hook to set a party to seated, done or eventually abandoned
 export function useUpdatePartyStatus() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -14,7 +13,6 @@ export function useUpdatePartyStatus() {
 
     try {
       const res = await fetch(`/api/parties/${uuid}`, {
-        // use uuid here
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ newStatus: status }),
