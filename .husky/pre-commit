@@ -9,12 +9,12 @@ echo "Running typecheck in next-app..."
 npm run typecheck
 
 # tests fixed to 80% coverage in jest.config.ts
-# echo "Running tests in next-app..."
-# npm run test:coverage
+echo "Running tests in next-app..."
+npm run test:coverage
 
 # test backend
-# cd ../backend
-# echo "Running tests in backend..."
-# npm test
+cd ../backend
+echo "Running tests in backend..."
+npm test
 
 # exit 1 # uncomment to test husky
