@@ -3,6 +3,10 @@ import { GET } from '@/app/api/parties/route';
 global.fetch = jest.fn();
 
 describe('GET /api/parties', () => {
+  const consoleErrorSpy = jest
+    .spyOn(console, 'error')
+    .mockImplementation(() => {});
+
   it('returns parties data successfully', async () => {
     const mockData = [
       { uuid: 'uuid-1', name: 'Alice', size: 2, status: 'waiting' },
@@ -28,5 +32,9 @@ describe('GET /api/parties', () => {
 
     expect(response.status).toBe(500);
     expect(json).toEqual({ error: 'Failed to fetch parties' });
+  });
+
+  afterAll(() => {
+    consoleErrorSpy.mockRestore();
   });
 });
