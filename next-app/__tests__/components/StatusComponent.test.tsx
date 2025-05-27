@@ -50,7 +50,8 @@ describe('StatusComponent', () => {
     expect(
       screen.getByText('Your table is ready, The Smiths')
     ).toBeInTheDocument();
-    expect(screen.getByText('Show this to the host: 123')).toBeInTheDocument();
+    expect(screen.getByText('Show this to the host:')).toBeInTheDocument();
+    expect(screen.getByText('123')).toBeInTheDocument();
 
     // Should NOT show the wait time
     expect(screen.queryByText(/minute wait/i)).not.toBeInTheDocument();

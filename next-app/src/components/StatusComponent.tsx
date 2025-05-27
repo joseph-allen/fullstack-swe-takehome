@@ -69,7 +69,14 @@ export const StatusComponent = ({
             component="p"
             sx={{ marginTop: 2, textAlign: 'center' }}
           >
-            Show this to the host: {partyID}
+            Show this to the host:
+          </Typography>
+          <Typography
+            variant="h2"
+            component="p"
+            sx={{ marginTop: 8, textAlign: 'center' }}
+          >
+            {partyID}
           </Typography>
         </>
       )}

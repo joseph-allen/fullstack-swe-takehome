@@ -69,6 +69,13 @@ export default function HomePage() {
     }
   }, [pingData]);
 
+  // Update the page when the user reaches the front of the queue
+  useEffect(() => {
+    if (current === 'inQueue' && joinedPartyID === nextPartyId) {
+      readyToCheckIn();
+    }
+  }, [current, joinedPartyID, nextPartyId, readyToCheckIn]);
+
   const mutation = useJoinQueueMutation((data) => {
     setJoinedPartyID(data.id);
     queueJoined();
@@ -116,7 +123,7 @@ export default function HomePage() {
         </Box>
       )}
 
-      {current === 'inQueue' && (
+      {(current === 'inQueue' || current === 'readyToCheckIn') && (
         <StatusComponent
           state={current}
           name={customerName}
@@ -221,8 +228,6 @@ export default function HomePage() {
           />
         )}
 
-        {/* TODO: Add in Queue state */}
-        {/* TODO: Add current next party and time estimate */}
         {/* TODO: Change state when partyID matches NextPartyID  */}
         {current === 'inQueue' && (
           <>
