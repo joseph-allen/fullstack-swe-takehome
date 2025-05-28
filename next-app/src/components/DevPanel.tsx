@@ -13,6 +13,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useUUID } from '@/context/UUIDContext';
 import { usePingDB } from '@/hooks/usePingDB';
 import renderSeats from '@/helpers/renderSeats';
+import { usePartiesWithStatus } from '@/hooks/usePartiesWithStatus';
 
 type DevPanelProps = {
   joinedPartyID: string;
@@ -35,6 +36,8 @@ export default function DevPanel({
 }: DevPanelProps) {
   const { uuid, removeUUID } = useUUID();
   const { data, error, isLoading } = usePingDB();
+  const { parties: waitingParties } = usePartiesWithStatus('waiting');
+
   const [open, setOpen] = useState(true);
 
   const canSeatNextParty =
@@ -186,6 +189,33 @@ export default function DevPanel({
               </Box>
             </Box>
           )}
+
+          {/* Queue viz */}
+          <Box mt={2} fontFamily="Courier New, monospace" fontSize={16}>
+            <Typography>Queue (waiting parties):</Typography>
+            {waitingParties.length === 0 && (
+              <Typography>(No parties waiting)</Typography>
+            )}
+            {waitingParties.map((party) => {
+              const isYourParty = party.partyID === joinedPartyID;
+              return (
+                <Box
+                  key={party.uuid}
+                  display="flex"
+                  alignItems="center"
+                  gap={1}
+                  mt={0.5}
+                >
+                  <Typography>{party.partyID}</Typography>
+                  <span>
+                    {isYourParty
+                      ? '🟢'.repeat(party.size) + '(You)'
+                      : '🟩'.repeat(party.size)}
+                  </span>
+                </Box>
+              );
+            })}
+          </Box>
 
           {joinedPartyID && (
             <Typography mt={2}>

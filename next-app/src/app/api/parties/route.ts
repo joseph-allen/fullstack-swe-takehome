@@ -1,8 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET() {
+const ALLOWED_STATUSES = ['waiting', 'seated', 'done'];
+
+export async function GET(req: NextRequest) {
   try {
-    const res = await fetch('http://backend:4000/parties');
+    const status = req.nextUrl.searchParams.get('status');
+
+    // Validate the status if provided
+    if (status && !ALLOWED_STATUSES.includes(status)) {
+      return NextResponse.json(
+        {
+          error: `Invalid status: must be one of ${ALLOWED_STATUSES.join(', ')}`,
+        },
+        { status: 400 }
+      );
+    }
+
+    const url = new URL('http://backend:4000/parties');
+    if (status) {
+      url.searchParams.set('status', status);
+    }
+
+    const res = await fetch(url.toString());
     const data = await res.json();
 
     return NextResponse.json(data, {

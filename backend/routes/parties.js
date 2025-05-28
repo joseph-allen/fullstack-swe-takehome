@@ -16,6 +16,13 @@ const getNextPartyID = require("../helpers/getNextPartyID");
  *   get:
  *     summary: Get all parties
  *     tags: [Parties]
+ *     parameters:
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [waiting, seated, cancelled]
+ *         description: Filter parties by their status
  *     responses:
  *       200:
  *         description: A list of parties
@@ -27,8 +34,17 @@ const getNextPartyID = require("../helpers/getNextPartyID");
  *                 $ref: '#/components/schemas/Party'
  */
 router.get("/", async (req, res) => {
+  const { status } = req.query;
+  const allowedStatuses = ["waiting", "seated", "done"];
+  const filter = {};
+
+  if (status && allowedStatuses.includes(status)) {
+    filter.status = status;
+  }
+
   try {
-    const parties = await Party.find();
+    const parties = await Party.find(filter);
+    console.log("Found parties:", parties.length);
     res.status(200).json(parties);
   } catch (error) {
     console.error("Error fetching parties:", error);
