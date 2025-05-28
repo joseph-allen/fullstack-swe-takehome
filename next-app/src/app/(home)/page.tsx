@@ -99,7 +99,7 @@ export default function HomePage() {
     if (isInQueue && joinedPartyID === nextPartyId) {
       readyToCheckIn();
     }
-  }, [current, joinedPartyID, nextPartyId, readyToCheckIn]);
+  }, [current, isInQueue, joinedPartyID, nextPartyId, readyToCheckIn]);
 
   const mutation = useJoinQueueMutation((data) => {
     setJoinedPartyID(data.id);
