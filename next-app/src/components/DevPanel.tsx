@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Drawer,
   Typography,
@@ -79,6 +79,12 @@ export default function DevPanel({
       refetch();
     }
   };
+
+  useEffect(() => {
+    if (refetch) {
+      refetch();
+    }
+  }, [data?.ping, refetch]);
 
   const fillQueue = () => {
     let count = 0;
@@ -229,14 +235,9 @@ export default function DevPanel({
                 </Typography>
               </Box>
 
-              {/* TODO: only render customerSize once this party is seated */}
               <Box mt={1} fontSize={20} fontFamily="Courier New, monospace">
                 Seats: <br />
-                {renderSeats(
-                  totalSeats,
-                  availableSeats ?? 0,
-                  customerSize ?? 0
-                )}
+                {renderSeats(totalSeats, availableSeats ?? 0, 0)}
               </Box>
             </Box>
           )}

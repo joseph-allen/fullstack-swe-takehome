@@ -114,7 +114,21 @@ router.get("/:uuid", async (req, res) => {
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Party'
+ *             type: object
+ *             required:
+ *               - uuid
+ *               - name
+ *               - size
+ *             properties:
+ *               uuid:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               size:
+ *                 type: integer
+ *               simulatedParty:
+ *                 type: boolean
+ *                 example: true
  *     responses:
  *       201:
  *         description: Party created successfully
@@ -149,9 +163,10 @@ router.get("/:uuid", async (req, res) => {
  *                   type: string
  *                   example: Failed to insert party
  */
+
 router.post("/", async (req, res) => {
   try {
-    const { uuid, name, size } = req.body;
+    const { uuid, name, size, simulatedParty } = req.body;
 
     if (!uuid || !name || typeof size !== "number") {
       return res.status(400).json({ error: "Missing required fields" });
@@ -166,11 +181,13 @@ router.post("/", async (req, res) => {
       createdAt: new Date(),
       status: "waiting", // Default status
       partyID,
+      simulatedParty,
     });
 
     const savedParty = await newParty.save();
 
     // Update system state after inserting new party
+    // TODO: this is the only place this is used, should it be?
     await updateSystemState();
 
     res.status(201).json({ message: "Party created", id: savedParty.partyID });
@@ -322,6 +339,9 @@ router.patch("/:uuid", async (req, res) => {
         { $inc: { availableSeats: party.size } }
       );
     }
+
+    // check for nextParty
+    await updateSystemState();
 
     return res.json({
       success: true,

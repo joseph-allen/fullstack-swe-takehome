@@ -2,7 +2,8 @@ export type PartyRequestPayload = {
   uuid: string;
   name: string;
   size: number;
-  status: 'waiting' | 'seated' | 'cancelled'; // You can adjust this union as needed
+  status: 'waiting' | 'seated' | 'cancelled';
+  simulatedParty?: boolean;
 };
 
 export type JoinQueueResponse = {
