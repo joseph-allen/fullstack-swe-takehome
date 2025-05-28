@@ -12,5 +12,6 @@ export function generateRandomParty(
     name: `Rand${id}`,
     size,
     status: 'waiting',
+    simulatedParty: true,
   };
 }

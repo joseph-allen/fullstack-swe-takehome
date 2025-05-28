@@ -20,10 +20,35 @@
   {
     "uuid": "uuid-3",
     "name": "Charlie",
-    "size": 4,
+    "size": 1,
     "status": "seated",
     "createdAt": "2025-05-28T09:30:00.000Z",
     "seatedAt": "2025-05-28T10:00:00.000Z",
+    "simulatedParty": true
+  },
+  {
+    "uuid": "uuid-4",
+    "name": "Dana",
+    "size": 2,
+    "status": "waiting",
+    "createdAt": "2025-05-28T09:00:00.000Z",
+    "seatedAt": null
+  },
+  {
+    "uuid": "uuid-5",
+    "name": "Eli",
+    "size": 4,
+    "status": "waiting",
+    "createdAt": "2025-05-28T09:30:00.000Z",
+    "seatedAt": null
+  },
+  {
+    "uuid": "uuid-6",
+    "name": "Joe",
+    "size": 4,
+    "status": "waiting",
+    "createdAt": "2025-05-28T09:30:00.000Z",
+    "seatedAt": null,
     "simulatedParty": true
   }
 ]

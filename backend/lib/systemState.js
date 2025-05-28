@@ -4,7 +4,7 @@ const System = require("../models/System");
 const calculateAvailableSeats = require("../helpers/calculateAvailibleSeats");
 
 async function updateSystemState() {
-  const waiting = await Party.find({ status: "waiting" }).sort({ partyId: 1 });
+  const waiting = await Party.find({ status: "waiting" }).sort({ partyID: 1 });
   const nextParty = waiting[0] || null;
   const totalSeats = 10;
   const availableSeats = await calculateAvailableSeats(totalSeats);
