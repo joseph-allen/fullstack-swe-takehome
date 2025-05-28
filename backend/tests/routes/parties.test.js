@@ -152,16 +152,16 @@ describe("Parties routes", () => {
     });
 
     it("returns 400 on invalid status transition", async () => {
-      // party status is 'waiting', but try to transition directly to 'done'
+      // transitioning from done to waiting is backwards, and invalid
       Party.findOne.mockResolvedValue({
         uuid: "test-uuid",
-        status: "waiting",
+        status: "done",
         size: 2,
       });
 
       const res = await request(app)
         .patch("/parties/test-uuid")
-        .send({ newStatus: "done" });
+        .send({ newStatus: "waiting" });
 
       expect(res.statusCode).toBe(400);
       expect(res.body.error).toMatch(/Invalid status transition/);
