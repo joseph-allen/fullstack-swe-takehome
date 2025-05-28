@@ -21,6 +21,7 @@ type DevPanelProps = {
   availableSeats: number | null;
   nextPartyId: string;
   nextPartySize: number | null;
+  customerSize: number;
 };
 
 export default function DevPanel({
@@ -30,6 +31,7 @@ export default function DevPanel({
   availableSeats,
   nextPartyId,
   nextPartySize,
+  customerSize,
 }: DevPanelProps) {
   const { uuid, removeUUID } = useUUID();
   const { data, error, isLoading } = usePingDB();
@@ -150,6 +152,9 @@ export default function DevPanel({
                 Next Party Size: <code>{nextPartySize ?? '?'}</code>
               </Typography>
               <Typography>
+                Your Party Size: <code>{customerSize ?? '?'}</code>
+              </Typography>
+              <Typography>
                 Can seat next party?{' '}
                 <code>{canSeatNextParty ? 'YES' : 'NO'}</code>
               </Typography>
@@ -170,13 +175,13 @@ export default function DevPanel({
                 </Typography>
               </Box>
 
-              {/* TODO: nextPartySize is always assuming 2 */}
+              {/* TODO: only render customerSize once this party is seated */}
               <Box mt={1} fontSize={20} fontFamily="Courier New, monospace">
                 Seats: <br />
                 {renderSeats(
                   totalSeats,
                   availableSeats ?? 0,
-                  nextPartySize ?? 0
+                  customerSize ?? 0
                 )}
               </Box>
             </Box>

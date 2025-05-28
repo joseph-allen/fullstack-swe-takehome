@@ -1,6 +1,6 @@
 import renderSeats from '@/helpers/renderSeats';
 
-describe('renderSeats', () => {
+describe.only('renderSeats', () => {
   it('renders all empty seats when no one is seated', () => {
     expect(renderSeats(5, 5, 0)).toBe('⬛⬛⬛⬛⬛');
   });
@@ -10,20 +10,11 @@ describe('renderSeats', () => {
     expect(renderSeats(5, 3, 2)).toBe('🟢🟢⬛⬛⬛');
   });
 
-  // TODO: This logic is not right, a party like this would never be sat
-  // it('limits current party rendering to available seats', () => {
-  //   expect(renderSeats(5, 1, 5)).toBe('🟢🟩🟩🟩⬛');
-  //   // total: 5, available: 1 => filled = 4
-  //   // partySize = 5, but only 4 filled, so party = 4, other = 0
-  //   expect(renderSeats(5, 0, 5)).toBe('🟢🟢🟢🟢🟢');
-  // });
-
-  // TODO: assumes 2 in party
-  // it('renders other parties correctly', () => {
-  //   expect(renderSeats(6, 2, 1)).toBe('🟢🟩🟩⬛⬛⬛');
-  //   // total: 6, available: 2 => filled = 4
-  //   // partySize = 1, other = 3
-  // });
+  it('renders other parties correctly', () => {
+    expect(renderSeats(6, 2, 1)).toBe('🟢🟩🟩🟩⬛⬛');
+    // total: 6, available: 2 => filled = 4
+    // partySize = 1, other = 3
+  });
 
   it('renders full room with mix of party and others', () => {
     expect(renderSeats(4, 0, 2)).toBe('🟢🟢🟩🟩');

@@ -48,7 +48,10 @@ export default function HomePage() {
   const [nextPartyId, setNextPartyId] = useState('000');
   const [nextPartySize, setNextPartySize] = useState<number | null>(null);
   const [joinedPartyID, setJoinedPartyID] = useState<string>('000');
+
+  // details for this session
   const [customerName, setCustomerName] = useState<string>('');
+  const [customerSize, setCustomerSize] = useState<number>(0);
 
   const {
     updatePartyStatus,
@@ -70,7 +73,7 @@ export default function HomePage() {
         forceInQueue();
         setJoinedPartyID(party.partyID);
       } else {
-        // TODO: check this works once ready to check in works
+        // TODO: check this works once "ready to check in" works
         reset();
       }
     }
@@ -117,6 +120,7 @@ export default function HomePage() {
         availableSeats={availableSeats}
         nextPartyId={nextPartyId}
         nextPartySize={nextPartySize}
+        customerSize={customerSize}
       />
 
       {current === 'formSubmitted' && (
@@ -236,7 +240,7 @@ export default function HomePage() {
                 size: data.size,
                 status: 'waiting',
               };
-
+              setCustomerSize(data.size);
               setCustomerName(data.name);
               submitForm();
               mutation.mutate(payload);
