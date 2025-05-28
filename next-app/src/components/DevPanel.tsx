@@ -40,7 +40,7 @@ export default function DevPanel({
   const { data, error, isLoading } = usePingDB();
   const { parties: waitingParties, refetch } = usePartiesWithStatus('waiting');
 
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   const canSeatNextParty =
     availableSeats !== null &&

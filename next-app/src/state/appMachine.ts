@@ -24,8 +24,12 @@ export const appMachine = createMachine({
       },
     },
     readyToCheckIn: {
-      // type: 'final' COMMENTED FOR DEBUGGING
-      on: { RESET: 'idle' },
+      on: {
+        CHECKED_IN: 'checkedIn',
+      },
+    },
+    checkedIn: {
+      type: 'final',
     },
   },
 });

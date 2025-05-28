@@ -1,5 +1,7 @@
 # Remote Waitlist Manager
 
+<!-- TODO: tidy up this header, summary and add GIF of flow and architecture -->
+
 Node Version - v22.15.0
 
 - [Project Board](https://github.com/users/joseph-allen/projects/2)
