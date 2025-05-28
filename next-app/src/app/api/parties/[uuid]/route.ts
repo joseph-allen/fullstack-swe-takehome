@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // @ts-expect-error TypeScript’s strict route handler typing expects the second parameter to be a Promise-like type
 export async function GET(req: NextRequest, context): Promise<NextResponse> {
-  const { uuid } = context.params;
+  const { uuid } = await context.params;
 
   if (!uuid) {
     return NextResponse.json({ error: 'No params provided' }, { status: 400 });

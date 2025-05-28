@@ -1,0 +1,42 @@
+[
+  {
+    "uuid": "uuid-1",
+    "name": "Alice",
+    "size": 1,
+    "status": "seated",
+    "createdAt": "2025-05-28T10:00:00.000Z",
+    "seatedAt": "2025-05-28T10:00:00.000Z"
+  },
+  {
+    "uuid": "uuid-2",
+    "name": "Bob",
+    "size": 5,
+    "status": "seated",
+    "createdAt": "2025-05-28T09:50:00.000Z",
+    "seatedAt": "2025-05-28T10:00:00.000Z"
+  },
+  {
+    "uuid": "uuid-3",
+    "name": "Charlie",
+    "size": 1,
+    "status": "seated",
+    "createdAt": "2025-05-28T09:30:00.000Z",
+    "seatedAt": "2025-05-28T10:00:00.000Z"
+  },
+  {
+    "uuid": "uuid-4",
+    "name": "Dana",
+    "size": 2,
+    "status": "waiting",
+    "createdAt": "2025-05-28T09:00:00.000Z",
+    "seatedAt": null
+  },
+  {
+    "uuid": "uuid-5",
+    "name": "Eli",
+    "size": 4,
+    "status": "waiting",
+    "createdAt": "2025-05-28T09:30:00.000Z",
+    "seatedAt": null
+  }
+]

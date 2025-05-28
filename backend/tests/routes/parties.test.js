@@ -3,12 +3,14 @@ const express = require("express");
 const partiesRouter = require("../../routes/parties"); // adjust path if needed
 const Party = require("../../models/Party");
 const getNextPartyID = require("../../helpers/getNextPartyID");
+const updateSystemState = require("../../lib/systemState");
 
 // Mock mongoose connection and db collection for PATCH route
 const mongoose = require("mongoose");
 
 jest.mock("../../models/Party");
 jest.mock("../../helpers/getNextPartyID");
+jest.mock("../../lib/systemState");
 
 // Mock collection for 'system' used in patch route
 const mockSystemCollection = {
@@ -65,6 +67,8 @@ describe("Parties routes", () => {
       const newParty = { uuid: "abc", name: "Test Party", size: 5 };
       getNextPartyID.mockResolvedValue("042");
 
+      updateSystemState.mockResolvedValue();
+
       Party.mockImplementation(function (data) {
         this.uuid = data.uuid;
         this.name = data.name;
@@ -88,6 +92,7 @@ describe("Parties routes", () => {
         partyID: "042",
       });
       expect(Party.mock.instances[0].save).toHaveBeenCalled();
+      expect(updateSystemState).toHaveBeenCalled();
     });
 
     it("should return 400 if missing fields", async () => {
