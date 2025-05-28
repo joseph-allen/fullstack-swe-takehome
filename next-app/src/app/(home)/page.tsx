@@ -260,7 +260,8 @@ export default function HomePage() {
                 color="warning"
                 onClick={() => {
                   leaveQueue();
-                  handleStatusUpdate('seated');
+                  handleStatusUpdate('done');
+                  resetAll();
                 }}
               >
                 Leave Queue

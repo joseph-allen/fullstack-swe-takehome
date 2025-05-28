@@ -1,4 +1,4 @@
-describe('Home Page End-to-End Flow', () => {
+describe('Home Page User abandons queue', () => {
   beforeEach(() => {
     cy.visit('http://localhost:3000/');
   });
@@ -12,7 +12,7 @@ describe('Home Page End-to-End Flow', () => {
     cy.get('form').should('exist');
     cy.get('form').within(() => {
       cy.get('input').first().type('The Smiths');
-      cy.root().submit(); // trigger the form submission
+      cy.root().submit();
     });
 
     // Step 3: Check formSubmitted state
@@ -21,10 +21,10 @@ describe('Home Page End-to-End Flow', () => {
 
     // Step 4: Check inQueue state
     cy.contains("You're in the queue").should('exist');
-    cy.contains('Ready to Check In (dev button)').click();
+    cy.contains('Ready to Check In').click();
 
     // Step 5: Check readyToCheckIn state
-    cy.contains('Reset (dev button)').click();
+    cy.contains('Reset').click();
 
     // Step 6: Should return to idle
     cy.contains('Get in the queue?').should('exist');

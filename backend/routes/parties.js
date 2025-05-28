@@ -245,11 +245,15 @@ router.patch("/:uuid", async (req, res) => {
 
     const currentStatus = party.status;
 
-    // Valid transitions only
+    // Valid transitions
+    // waiting -> seated - joining queue
+    // seated -> done - end of service
+    // waiting -> done - abandoned, or removed from queue
     if (
       !(
         (currentStatus === "waiting" && newStatus === "seated") ||
-        (currentStatus === "seated" && newStatus === "done")
+        (currentStatus === "seated" && newStatus === "done") ||
+        (currentStatus === "waiting" && newStatus === "done")
       )
     ) {
       return res.status(400).json({
