@@ -3,6 +3,8 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const Party = require("../models/Party");
 const getNextPartyID = require("../helpers/getNextPartyID");
+const updateSystemState = require("../lib/systemState");
+
 /**
  * @swagger
  * tags:
@@ -67,13 +69,15 @@ router.get("/", async (req, res) => {
  *         description: UUID of the party to retrieve
  *     responses:
  *       200:
- *         description: Party data retrieved successfully
+ *         description: Party data retrieved successfully, or null if none found
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Party'
- *       404:
- *         description: Party not found
+ *               anyOf:
+ *                 - $ref: '#/components/schemas/Party'
+ *                 - type: 'null'
+ *       500:
+ *         description: Server error fetching party
  *         content:
  *           application/json:
  *             schema:
@@ -81,7 +85,7 @@ router.get("/", async (req, res) => {
  *               properties:
  *                 error:
  *                   type: string
- *                   example: Party not found
+ *                   example: Failed to fetch party
  */
 router.get("/:uuid", async (req, res) => {
   const { uuid } = req.params;
@@ -89,7 +93,8 @@ router.get("/:uuid", async (req, res) => {
     const party = await Party.findOne({ uuid });
 
     if (!party) {
-      return res.status(404).json({ error: "Party not found" });
+      // No party found, but this is not an error
+      return res.status(200).json(null);
     }
     res.status(200).json(party);
   } catch (error) {
@@ -164,6 +169,10 @@ router.post("/", async (req, res) => {
     });
 
     const savedParty = await newParty.save();
+
+    // Update system state after inserting new party
+    await updateSystemState();
+
     res.status(201).json({ message: "Party created", id: savedParty.partyID });
   } catch (error) {
     console.error("Error inserting party:", error);

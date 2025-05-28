@@ -3,6 +3,8 @@ const { MongoClient } = require("mongodb");
 const uri = process.env.MONGODB_URI;
 const client = new MongoClient(uri);
 
+const partiesData = require("./parties/full-resturant-no-queue.json");
+
 async function getNextPartyID(db) {
   const result = await db
     .collection("counters")
@@ -30,48 +32,13 @@ async function main() {
 
   const TOTAL_SEATS = 10;
 
-  const parties = [
-    {
-      uuid: "uuid-1",
-      name: "Alice",
-      size: 1,
-      status: "seated",
-      createdAt: new Date(),
-      seatedAt: new Date(),
-    },
-    {
-      uuid: "uuid-2",
-      name: "Bob",
-      size: 5,
-      status: "seated",
-      createdAt: new Date(Date.now() - 10 * 60 * 1000),
-      seatedAt: new Date(),
-    },
-    {
-      uuid: "uuid-3",
-      name: "Charlie",
-      size: 1,
-      status: "seated",
-      createdAt: new Date(Date.now() - 30 * 60 * 1000),
-      seatedAt: new Date(),
-    },
-    {
-      uuid: "uuid-4",
-      name: "Dana",
-      size: 2,
-      status: "waiting",
-      createdAt: new Date(Date.now() - 60 * 60 * 1000),
-      seatedAt: null,
-    },
-    {
-      uuid: "uuid-5",
-      name: "Eli",
-      size: 4,
-      status: "waiting",
-      createdAt: new Date(Date.now() - 30 * 60 * 1000),
-      seatedAt: null,
-    },
-  ];
+  // Map JSON data and convert date strings to Date objects
+  // if seated, replace the seatedAt with now
+  const parties = partiesData.map((party) => ({
+    ...party,
+    createdAt: party.createdAt ? new Date(party.createdAt) : new Date(),
+    seatedAt: party.status === "seated" ? new Date() : null,
+  }));
 
   for (const party of parties) {
     party.partyID = await getNextPartyID(db);
