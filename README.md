@@ -432,3 +432,11 @@ would mean any next poll, would have all information needed to confidently offer
 I'm just going to add some table visualisation to the little dev panel now to prepare for this. I've fleshed out the dev panel now too. I wouldn't include this in a real site, but considering the rapid state changes we expect from the database and backend this is quite a nice way for me to visually confirm things look correct as I play around. A version of this panel could be what the resturant sees, or even a progress bar for the user while waiting.
 
 Polling is working much better than expected. I suppose the size of the resturant is so small, even if it had 100 seats or tables a greedy approach simulating them would still be fast. In the real world I'd expect this to be handled by the resturant somehow. While we could have threads running for each table, emitting SSE, or even use WebSockets I think I will leave that out of scope and try to tidy up what I have now. The tickets on the board are mostly done, save a few missed bits of logic that I'm going to try to stomp down and test.
+
+## Project End
+
+I've not updated this for a few PRs. I'm in the bug-stomping stage now, and I'm finding the dev panel I made to be shockingly useful. If I did this again I'd perhaps add to my architecture a developer dashboard / resturant dashboard for a lot of this functionality. Simulating Diners is a much larger piece of work than I'd realised, and I wish I had a clearer divide between this and the actual dashboard now. There's a lot of logic in the home page that probably shouldn't be there anymore.
+
+I'm about to simulate all diners as accepting their offer to sit down, even though they could abandon the queue, or even silently leave. I might simulate a timeout for them but at this point I've spent a few days on this and would rather cut out interesting features and get this to you in good time.
+
+I've got a few helpful Dev buttons that need to go, and my E2E test could be reimplemented at that time. I'm going to finish what I've got, tidy up the README and Code a little and call it done. Thanks for reading if you made it this far.
