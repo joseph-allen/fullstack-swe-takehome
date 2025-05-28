@@ -255,7 +255,14 @@ export default function HomePage() {
             <LoadingComponent text="Waiting" withDots />
             <Box display="flex" gap={4} alignItems="center">
               <Typography variant="h5">Change your mind?</Typography>
-              <Button variant="outlined" color="warning" onClick={leaveQueue}>
+              <Button
+                variant="outlined"
+                color="warning"
+                onClick={() => {
+                  leaveQueue();
+                  handleStatusUpdate('seated');
+                }}
+              >
                 Leave Queue
               </Button>
             </Box>
