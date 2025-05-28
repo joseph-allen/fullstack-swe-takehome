@@ -14,6 +14,8 @@ import { useUUID } from '@/context/UUIDContext';
 import { usePingDB } from '@/hooks/usePingDB';
 import renderSeats from '@/helpers/renderSeats';
 import { usePartiesWithStatus } from '@/hooks/usePartiesWithStatus';
+import { generateRandomParty } from '@/helpers/generateRandomParty';
+import { useJoinQueueMutation } from '@/hooks/useJoinQueueMutation';
 
 type DevPanelProps = {
   joinedPartyID: string;
@@ -36,7 +38,7 @@ export default function DevPanel({
 }: DevPanelProps) {
   const { uuid, removeUUID } = useUUID();
   const { data, error, isLoading } = usePingDB();
-  const { parties: waitingParties } = usePartiesWithStatus('waiting');
+  const { parties: waitingParties, refetch } = usePartiesWithStatus('waiting');
 
   const [open, setOpen] = useState(true);
 
@@ -46,6 +48,55 @@ export default function DevPanel({
     availableSeats >= nextPartySize;
 
   const isUserNextParty = joinedPartyID === nextPartyId;
+
+  const mutation = useJoinQueueMutation(() => {
+    // I don't need any state to be updated for dev purposes.
+    // pass
+  });
+
+  const addRandomParties = async () => {
+    const randomSizes = [2, 3, 4, 5, 6];
+    const numberOfParties = 1;
+
+    // Wrap mutation.mutate in a Promise to await completion
+    const promises = [];
+    for (let i = 0; i < numberOfParties; i++) {
+      const size = randomSizes[Math.floor(Math.random() * randomSizes.length)];
+      const party = generateRandomParty(size);
+
+      const promise = new Promise<void>((resolve, reject) => {
+        mutation.mutate(party, {
+          onSuccess: () => resolve(),
+          onError: (error) => reject(error),
+        });
+      });
+      promises.push(promise);
+    }
+    await Promise.all(promises);
+
+    // After all mutations finish, refresh parties
+    if (refetch) {
+      refetch();
+    }
+  };
+
+  const fillQueue = () => {
+    let count = 0;
+    const queueSize = 10;
+
+    const intervalId = setInterval(async () => {
+      if (count >= queueSize) {
+        clearInterval(intervalId);
+        return;
+      }
+      try {
+        await addRandomParties();
+      } catch (err) {
+        console.error('Error adding random parties:', err);
+      }
+      count++;
+    }, 1000);
+  };
 
   return (
     <>
@@ -222,6 +273,17 @@ export default function DevPanel({
               Assigned Party ID: <code>{joinedPartyID}</code>
             </Typography>
           )}
+
+          <Button
+            variant="contained"
+            color="success"
+            size="small"
+            sx={{ mt: 2, fontFamily: 'Courier New, monospace' }}
+            onClick={fillQueue}
+            disabled={mutation.status === 'pending'}
+          >
+            Fill Queue
+          </Button>
 
           {patchError && (
             <Typography color="error" mt={2}>
