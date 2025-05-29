@@ -1,42 +1,48 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { jsonError } from '@/helpers/apiHelpers';
+
+const BACKEND_URL = 'http://backend:4000/parties';
 
 // @ts-expect-error TypeScript’s strict route handler typing expects the second parameter to be a Promise-like type
 export async function GET(req: NextRequest, context): Promise<NextResponse> {
-  const { uuid } = await context.params;
+  const { uuid } = context.params ?? {};
 
+  // if client didn't send a uuid, but somehow got here
   if (!uuid) {
-    return NextResponse.json({ error: 'No params provided' }, { status: 400 });
+    return jsonError('No params provided', 400);
   }
 
   try {
-    const res = await fetch(`http://backend:4000/parties/${uuid}`);
+    // make GET call
+    const res = await fetch(`${BACKEND_URL}/${uuid}`);
 
     if (!res.ok) {
-      return NextResponse.json({ error: 'Party not found' }, { status: 404 });
+      return jsonError('Party not found', 404);
     }
 
     const party = await res.json();
     return NextResponse.json(party);
   } catch (error) {
-    console.error('Error proxying GET /parties:', error);
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+    console.error('GET /parties/:uuid error:', error);
+    return jsonError('Server error', 500);
   }
 }
 
 // @ts-expect-error TypeScript’s strict route handler typing expects the second parameter to be a Promise-like type
 export async function PATCH(req: NextRequest, context): Promise<NextResponse> {
+  const { params } = context;
+
+  // update state of named UUID
+  if (!params || !params.uuid) {
+    return jsonError('UUID is required', 400);
+  }
+
   try {
-    const { params } = context;
-
-    if (!params || !params.uuid) {
-      return NextResponse.json({ error: 'UUID is required' }, { status: 400 });
-    }
-
     const { uuid } = params;
 
     const body = await req.json();
 
-    const res = await fetch(`http://backend:4000/parties/${uuid}`, {
+    const res = await fetch(`${BACKEND_URL}/${uuid}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -46,10 +52,7 @@ export async function PATCH(req: NextRequest, context): Promise<NextResponse> {
     console.log('PATCH response from backend:', res.status, text);
 
     if (!res.ok) {
-      return NextResponse.json(
-        { error: 'Failed to update party' },
-        { status: res.status }
-      );
+      return jsonError('Failed to update party', res.status);
     }
 
     const data = JSON.parse(text);
@@ -59,10 +62,7 @@ export async function PATCH(req: NextRequest, context): Promise<NextResponse> {
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error('Error proxying PATCH /parties:', error);
-    return NextResponse.json(
-      { error: 'Failed to update party' },
-      { status: 500 }
-    );
+    console.error('PATCH /parties/:uuid error:', error);
+    return jsonError('Failed to update party', 500);
   }
 }

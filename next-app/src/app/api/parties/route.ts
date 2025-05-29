@@ -1,25 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { jsonError } from '@/helpers/apiHelpers';
 
+const BACKEND_URL = 'http://backend:4000/parties';
 const ALLOWED_STATUSES = ['waiting', 'seated', 'done'];
 
+// Fetch a party, optionally filter by allowed statuses
 export async function GET(req: NextRequest) {
+  const status = req.nextUrl.searchParams.get('status');
+
+  // if status is in params, and allowed
+  if (status && !ALLOWED_STATUSES.includes(status)) {
+    return jsonError(
+      `Invalid status: must be one of ${ALLOWED_STATUSES.join(', ')}`,
+      400
+    );
+  }
+
   try {
-    const status = req.nextUrl.searchParams.get('status');
-
-    // Validate the status if provided
-    if (status && !ALLOWED_STATUSES.includes(status)) {
-      return NextResponse.json(
-        {
-          error: `Invalid status: must be one of ${ALLOWED_STATUSES.join(', ')}`,
-        },
-        { status: 400 }
-      );
-    }
-
-    const url = new URL('http://backend:4000/parties');
-    if (status) {
-      url.searchParams.set('status', status);
-    }
+    const url = new URL(BACKEND_URL);
+    if (status) url.searchParams.set('status', status);
 
     const res = await fetch(url.toString());
     const data = await res.json();
@@ -29,19 +28,17 @@ export async function GET(req: NextRequest) {
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error('Error proxying GET /parties:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch parties' },
-      { status: 500 }
-    );
+    console.error('GET /api/parties error:', error);
+    return jsonError('Failed to fetch parties', 500);
   }
 }
 
-export async function POST(request: NextRequest) {
+// POST to create a new party
+export async function POST(req: NextRequest) {
   try {
-    const body = await request.json();
+    const body = await req.json();
 
-    const res = await fetch('http://backend:4000/parties', {
+    const res = await fetch(BACKEND_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -54,13 +51,10 @@ export async function POST(request: NextRequest) {
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error('Error proxying PATCH /parties:', error);
-    return NextResponse.json(
-      {
-        error:
-          error instanceof Error ? error.message : 'Failed to update party',
-      },
-      { status: 500 }
+    console.error('POST /api/parties error:', error);
+    return jsonError(
+      error instanceof Error ? error.message : 'Failed to create party',
+      500
     );
   }
 }

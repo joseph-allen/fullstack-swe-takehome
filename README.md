@@ -186,7 +186,7 @@ A take home task is a great time to try something new, and I haven't used xState
 
 ### 4. Setup MongoDB + Docker + Deployments
 
-MongoDB was a requirement, and is what I'm use commonly as Next.js + MongoDB covers most use cases I face. I'm normally required to interact with MongoDB, but not code it myself so I anticipate needing some helper scripts to "reset" and "populate" this database as part of the front-end.
+MongoDB implementation was a requirement of the task. Most Apps I work on these days are Next.js + Flask + MongoDB, so this is somewhat familiar to me. I'm normally required to interact with MongoDB, but not code it myself so I anticipate needing some helper scripts to "reset" and "populate" this database as part of the front-end.
 
 I use WSL, as I'm on a Windows machine for now and setting this up with MongoDB is a pretty awful experience. Luckily, since a later requirement is to move over to a Docker script I'm bringing that in now.
 

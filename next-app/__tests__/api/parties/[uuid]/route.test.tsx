@@ -1,6 +1,7 @@
 import { PATCH } from '@/app/api/parties/[uuid]/route';
 import { NextResponse } from 'next/server';
 
+// mock json response calls
 jest.mock('next/server', () => ({
   NextResponse: {
     json: jest.fn(),
@@ -12,14 +13,15 @@ describe('PATCH handler', () => {
     jest.clearAllMocks();
   });
 
-  const mockRequest = (body) => ({
+  // Creates a fake request object with a .json() method
+  const mockRequest = (body: any) => ({
     json: jest.fn().mockResolvedValue(body),
   });
 
   it('returns 400 if uuid param is missing', async () => {
     const req = mockRequest({ newStatus: 'seated' });
 
-    const res = await PATCH(req, { params: { uuid: '' } });
+    const res = await PATCH(req as any, { params: { uuid: '' } });
 
     expect(NextResponse.json).toHaveBeenCalledWith(
       { error: 'UUID is required' },
@@ -32,7 +34,7 @@ describe('PATCH handler', () => {
     const req = mockRequest(reqBody);
     const params = { uuid: 'abc123' };
 
-    // Mock global fetch
+    // simulate successful http response
     global.fetch = jest.fn().mockResolvedValue({
       status: 200,
       ok: true,
@@ -68,14 +70,17 @@ describe('PATCH handler', () => {
     const params = { uuid: 'abc123' };
 
     global.fetch = jest.fn().mockRejectedValue(new Error('Network failure'));
+
+    // supress console errors during tests
     const consoleErrorSpy = jest
       .spyOn(console, 'error')
       .mockImplementation(() => {});
 
-    await PATCH(req, { params });
+    await PATCH(req as any, { params });
 
+    // catch expected console error
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      'Error proxying PATCH /parties:',
+      'PATCH /parties/:uuid error:',
       expect.any(Error)
     );
 
