@@ -1,6 +1,7 @@
 # Remote Waitlist Manager
 
 <!-- TODO: tidy up this header, summary and add GIF of flow and architecture -->
+![Queue](https://github.com/user-attachments/assets/a69f69e4-394f-46ee-8a2f-c4ef07996852)
 
 Node Version - v22.15.0
 
