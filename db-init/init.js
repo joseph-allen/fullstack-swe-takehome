@@ -6,8 +6,6 @@ const client = new MongoClient(uri);
 
 const TOTAL_SEATS = 10;
 
-// get next partyID with 3 character zero padding - 001,002,003
-// This should probably be a helper somewhere
 async function getNextPartyID(db) {
   const result = await db
     .collection("counters")
