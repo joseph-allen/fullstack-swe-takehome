@@ -95,7 +95,9 @@ My solution, generally follows this structure:
 6. If there is space, and the partyID matches the user is offered a chance to check in.
 7. The user shows their success screen to the resturant, and checks in.
 
-<!-- TODO: Add architecture diagram here -->
+I did this by polling the database for updates, and having a Queue processing simulator that ticked as frequently as the polling.
+
+![Architecture](https://github.com/user-attachments/assets/1afb79e2-d56e-4913-974b-d4e5a83ba551)
 
 I added a lot of developer options to simulate diners for testing, which was out of scope but the most fun. You can open this clicking the Dev Panel button in the top-left of the app.
 
