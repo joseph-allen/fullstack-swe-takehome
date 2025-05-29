@@ -1,27 +1,26 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+// libs
 import Confetti from 'react-confetti-boom';
 import { Box, Button, Divider, Typography } from '@mui/material';
-
+// components
 import DevPanel from '@/components/DevPanel';
 import StatusComponent from '@/components/StatusComponent';
 import TableForm from '@/components/TableForm';
 import LoadingComponent from '@/components/LoadingComponent';
-
+// helpers
+import { calculateWaitEstimate } from '@/helpers/calculateWaitEstimate';
+// hooks
 import { useAppMachine } from '@/hooks/useAppMachine';
 import { useUpdatePartyStatus } from '@/hooks/useUpdatePartyStatus';
 import { useJoinQueueMutation } from '@/hooks/useJoinQueueMutation';
 import { usePingDB } from '@/hooks/usePingDB';
 import { useParty } from '@/hooks/useParty';
+// context
 import { useUUID } from '@/context/UUIDContext';
-
-type AppState =
-  | 'idle'
-  | 'showForm'
-  | 'formSubmitted'
-  | 'inQueue'
-  | 'readyToCheckIn';
+// types
+import type { AppState } from '@/types/appState';
 
 export default function HomePage() {
   const {
@@ -31,18 +30,23 @@ export default function HomePage() {
     queueJoined,
     leaveQueue,
     readyToCheckIn,
+    checkedIn,
     reset,
     forceInQueue,
     forceReady,
   } = useAppMachine();
+  const current = currentState as AppState;
 
   const { uuid, removeUUID, resetUUID } = useUUID();
   const { party, loading: partyLoading, error: partyError } = useParty(uuid);
-
-  const current = currentState as AppState;
-
   const { data: pingData } = usePingDB();
+  const {
+    updatePartyStatus,
+    loading: patchLoading,
+    error: patchError,
+  } = useUpdatePartyStatus();
 
+  // local state
   const [totalSeats, setTotalSeats] = useState(0);
   const [availableSeats, setAvailableSeats] = useState<number | null>(null);
   const [nextPartyId, setNextPartyId] = useState('000');
@@ -53,29 +57,29 @@ export default function HomePage() {
   const [customerName, setCustomerName] = useState<string>('');
   const [customerSize, setCustomerSize] = useState<number>(0);
 
-  const {
-    updatePartyStatus,
-    loading: patchLoading,
-    error: patchError,
-  } = useUpdatePartyStatus();
+  // helper booleans
+  const isIdle = current === 'idle';
+  const isShowForm = current === 'showForm';
+  const isInQueue = current === 'inQueue';
+  const isReadyToCheckIn = current === 'readyToCheckIn';
+  const isCheckedIn = current === 'checkedIn';
 
-  function calculateWaitEstimate(
-    partyID?: string,
-    nextPartyID?: string
-  ): number {
-    if (!partyID || !nextPartyID) return 0;
-    return Math.max(0, (parseInt(partyID) - parseInt(nextPartyID)) * 5);
-  }
+  const waitEstimate = useMemo(
+    () => calculateWaitEstimate(joinedPartyID, nextPartyId),
+    [joinedPartyID, nextPartyId]
+  );
 
   useEffect(() => {
     if (party && !partyLoading && !partyError) {
       if (party.status === 'waiting') {
         forceInQueue();
         setJoinedPartyID(party.partyID);
-      } else {
-        // TODO: check this works once "ready to check in" works
-        reset();
       }
+      // else {
+      // TODO: check this works once "ready to check in" works
+      // TODO: do I also need to move user to ready here with forceReady?
+      // reset();
+      // }
     }
   }, [party, partyLoading, partyError, forceInQueue, forceReady, reset]);
 
@@ -91,24 +95,32 @@ export default function HomePage() {
 
   // Update the page when the user reaches the front of the queue
   useEffect(() => {
-    if (current === 'inQueue' && joinedPartyID === nextPartyId) {
+    if (isInQueue && joinedPartyID === nextPartyId) {
       readyToCheckIn();
     }
-  }, [current, joinedPartyID, nextPartyId, readyToCheckIn]);
+  }, [current, isInQueue, joinedPartyID, nextPartyId, readyToCheckIn]);
 
   const mutation = useJoinQueueMutation((data) => {
     setJoinedPartyID(data.id);
     queueJoined();
   });
 
-  const handleStatusUpdate = (status: 'seated' | 'done') => {
-    if (uuid) updatePartyStatus(uuid, status);
+  const handleFormSubmit = (data: { name: string; size: number }) => {
+    const payload = {
+      uuid,
+      name: data.name,
+      size: data.size,
+      status: 'waiting',
+    };
+    setCustomerSize(data.size);
+    setCustomerName(data.name);
+    submitForm();
+    mutation.mutate(payload);
   };
 
-  const resetAll = () => {
-    reset();
-    removeUUID();
-    resetUUID();
+  const handleStatusUpdate = (status: 'seated' | 'done') => {
+    if (uuid) updatePartyStatus(uuid, status);
+    checkedIn();
   };
 
   return (
@@ -123,89 +135,24 @@ export default function HomePage() {
         customerSize={customerSize}
       />
 
-      {current === 'formSubmitted' && (
-        <Box textAlign="center">
-          <LoadingComponent text="Joining Queue" withDots />
-          <Button
-            variant="contained"
-            size="small"
-            sx={{
-              bgcolor: '#00FF00',
-              color: '#000',
-              fontFamily: 'Courier New, monospace',
-              '&:hover': {
-                bgcolor: '#00CC00',
-              },
-            }}
-            onClick={queueJoined}
-          >
-            Skip wait
-          </Button>
-        </Box>
-      )}
-
-      {(current === 'inQueue' || current === 'readyToCheckIn') && (
+      {(isInQueue || isReadyToCheckIn) && (
         <StatusComponent
           state={current}
           name={customerName}
           partyID={joinedPartyID}
           nextPartyID={nextPartyId}
-          estimateInMinutes={calculateWaitEstimate(joinedPartyID, nextPartyId)}
+          estimateInMinutes={waitEstimate}
         />
       )}
 
-      {current === 'readyToCheckIn' && uuid && (
-        <Box mt={2} display="flex" gap={2} justifyContent="center">
-          <Button
-            variant="contained"
-            size="small"
-            sx={{
-              bgcolor: '#00FF00',
-              color: '#000',
-              fontFamily: 'Courier New, monospace',
-              '&:hover': {
-                bgcolor: '#00CC00',
-              },
-            }}
-            onClick={() => handleStatusUpdate('seated')}
-            disabled={patchLoading}
-          >
-            Mark as Seated
-          </Button>
-
-          <Button
-            variant="contained"
-            size="small"
-            sx={{
-              bgcolor: '#00FF00',
-              color: '#000',
-              fontFamily: 'Courier New, monospace',
-              '&:hover': {
-                bgcolor: '#00CC00',
-              },
-            }}
-            onClick={() => handleStatusUpdate('done')}
-            disabled={patchLoading}
-          >
-            Mark as Done
-          </Button>
-
-          <Button
-            variant="contained"
-            size="small"
-            sx={{
-              bgcolor: '#00FF00',
-              color: '#000',
-              fontFamily: 'Courier New, monospace',
-              '&:hover': {
-                bgcolor: '#00CC00',
-              },
-            }}
-            onClick={resetAll}
-          >
-            Reset
-          </Button>
-        </Box>
+      {isReadyToCheckIn && uuid && party?.status !== 'seated' && (
+        <Button
+          variant="outlined"
+          onClick={() => handleStatusUpdate('seated')}
+          disabled={patchLoading}
+        >
+          Check In
+        </Button>
       )}
 
       {current == 'inQueue' && <Divider flexItem sx={{ my: 4 }} />}
@@ -217,7 +164,7 @@ export default function HomePage() {
         gap={4}
         width="100%"
       >
-        {current === 'idle' && (
+        {isIdle && (
           <>
             <Typography variant="h3" component="p">
               {`Welcome to Uncle Joe's`}
@@ -231,26 +178,15 @@ export default function HomePage() {
           </>
         )}
 
-        {current === 'showForm' && (
+        {isShowForm && (
           <TableForm
-            onSubmit={(data) => {
-              const payload = {
-                uuid,
-                name: data.name,
-                size: data.size,
-                status: 'waiting',
-              };
-              setCustomerSize(data.size);
-              setCustomerName(data.name);
-              submitForm();
-              mutation.mutate(payload);
-            }}
+            onSubmit={handleFormSubmit}
             isLoading={mutation.status === 'pending'}
           />
         )}
 
         {/* TODO: Change state when partyID matches NextPartyID  */}
-        {current === 'inQueue' && (
+        {isInQueue && (
           <>
             <LoadingComponent text="Waiting" withDots />
             <Box display="flex" gap={4} alignItems="center">
@@ -259,33 +195,19 @@ export default function HomePage() {
                 variant="outlined"
                 color="warning"
                 onClick={() => {
-                  leaveQueue();
                   handleStatusUpdate('done');
-                  resetAll();
+                  leaveQueue();
+                  removeUUID();
+                  resetUUID();
                 }}
               >
                 Leave Queue
               </Button>
             </Box>
-            <Button
-              variant="contained"
-              size="small"
-              sx={{
-                bgcolor: '#00FF00',
-                color: '#000',
-                fontFamily: 'Courier New, monospace',
-                '&:hover': {
-                  bgcolor: '#00CC00',
-                },
-              }}
-              onClick={readyToCheckIn}
-            >
-              Ready to Check In
-            </Button>
           </>
         )}
 
-        {current === 'readyToCheckIn' && (
+        {isReadyToCheckIn && (
           <Confetti
             particleCount={80}
             effectCount={10}
@@ -294,6 +216,17 @@ export default function HomePage() {
             spreadDeg={90}
             y={0.8}
           />
+        )}
+
+        {isCheckedIn && (
+          <>
+            <Typography variant="h3" component="p">
+              {`Thanks for visiting Uncle Joe's,`}
+            </Typography>
+            <Typography variant="h4" component="p">
+              See you soon.
+            </Typography>
+          </>
         )}
       </Box>
     </>

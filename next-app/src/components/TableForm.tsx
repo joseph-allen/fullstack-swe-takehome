@@ -123,7 +123,7 @@ export const TableForm: React.FC<{
 
           <Button
             type="submit"
-            variant="contained"
+            variant="outlined"
             fullWidth
             disabled={isLoading}
           >

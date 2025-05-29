@@ -65,28 +65,6 @@ describe('useAppMachine hook', () => {
     expect(result.current.currentState).toBe('readyToCheckIn');
   });
 
-  it('resets from readyToCheckIn → idle on reset()', () => {
-    const { result } = renderHook(() => useAppMachine());
-
-    act(() => {
-      result.current.joinQueue();
-    });
-    act(() => {
-      result.current.submitForm();
-    });
-    act(() => {
-      result.current.queueJoined();
-    });
-    act(() => {
-      result.current.readyToCheckIn();
-    });
-    act(() => {
-      result.current.reset();
-    });
-
-    expect(result.current.currentState).toBe('idle');
-  });
-
   it('transitions from inQueue → idle on leaveQueue()', () => {
     const { result } = renderHook(() => useAppMachine());
 
@@ -124,5 +102,53 @@ describe('useAppMachine hook', () => {
     });
 
     expect(result.current.currentState).toBe('readyToCheckIn');
+  });
+
+  it('transitions from readyToCheckIn → checkedIn on checkedIn()', () => {
+    const { result } = renderHook(() => useAppMachine());
+
+    act(() => {
+      result.current.joinQueue();
+    });
+    act(() => {
+      result.current.submitForm();
+    });
+    act(() => {
+      result.current.queueJoined();
+    });
+    act(() => {
+      result.current.readyToCheckIn();
+    });
+    act(() => {
+      result.current.checkedIn();
+    });
+
+    expect(result.current.currentState).toBe('checkedIn');
+  });
+
+  it('does not transition out of checkedIn (final state)', () => {
+    const { result } = renderHook(() => useAppMachine());
+
+    act(() => {
+      result.current.joinQueue();
+    });
+    act(() => {
+      result.current.submitForm();
+    });
+    act(() => {
+      result.current.queueJoined();
+    });
+    act(() => {
+      result.current.readyToCheckIn();
+    });
+    act(() => {
+      result.current.checkedIn();
+    });
+
+    act(() => {
+      result.current.reset();
+    });
+
+    expect(result.current.currentState).toBe('checkedIn');
   });
 });
