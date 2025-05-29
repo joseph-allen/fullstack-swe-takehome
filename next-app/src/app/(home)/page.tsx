@@ -33,7 +33,6 @@ export default function HomePage() {
     checkedIn,
     reset,
     forceInQueue,
-    forceReady,
   } = useAppMachine();
   const current = currentState as AppState;
 
@@ -64,24 +63,21 @@ export default function HomePage() {
   const isReadyToCheckIn = current === 'readyToCheckIn';
   const isCheckedIn = current === 'checkedIn';
 
+  // wait time only changes when the nextPartyID changes, useMemo caches this calculation
   const waitEstimate = useMemo(
     () => calculateWaitEstimate(joinedPartyID, nextPartyId),
     [joinedPartyID, nextPartyId]
   );
 
+  // When a UUID is the same, we need to force a user back to their previous state
   useEffect(() => {
     if (party && !partyLoading && !partyError) {
       if (party.status === 'waiting') {
         forceInQueue();
         setJoinedPartyID(party.partyID);
       }
-      // else {
-      // TODO: check this works once "ready to check in" works
-      // TODO: do I also need to move user to ready here with forceReady?
-      // reset();
-      // }
     }
-  }, [party, partyLoading, partyError, forceInQueue, forceReady, reset]);
+  }, [party, partyLoading, partyError, forceInQueue, reset]);
 
   useEffect(() => {
     if (pingData?.system?.[0]) {

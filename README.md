@@ -25,6 +25,19 @@ Once you have the App running locally, as described below, you can explore the f
 - [The Backend](http://localhost:4000/)
 - [The Swagger Documentation](http://localhost:4000/api-docs/)
 
+### Extras
+
+- Husky pre-commit - This entire project was developed on an 80% coverage restriction.
+- Github Actions - On every commit we deploy a new public Storybook, run E2E tests on Chromatic and deploy the front-end using Vercel.
+
+### Files of note
+
+- [Home page](<https://github.com/joseph-allen/fullstack-swe-takehome/blob/main/next-app/src/app/(home)/page.tsx>)
+- [UUID Hook](https://github.com/joseph-allen/fullstack-swe-takehome/blob/main/next-app/src/hooks/useClientUUID.ts)
+- [Docker Compose](https://github.com/joseph-allen/fullstack-swe-takehome/blob/main/docker-compose.yml)
+- [DB Initialiser](https://github.com/joseph-allen/fullstack-swe-takehome/blob/main/db-init/init.js)
+- [Backend Routes](https://github.com/joseph-allen/fullstack-swe-takehome/blob/main/backend/routes/parties.js)
+
 ## Setup
 
 ### Quick run with Docker
