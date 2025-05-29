@@ -2,10 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { jsonError } from '@/helpers/apiHelpers';
 
 const BACKEND_URL = 'http://backend:4000/parties';
+export const dynamic = 'force-dynamic';
 
-// @ts-expect-error TypeScript’s strict route handler typing expects the second parameter to be a Promise-like type
-export async function GET(req: NextRequest, context): Promise<NextResponse> {
-  const { uuid } = context.params ?? {};
+export async function GET(
+  req: NextRequest,
+  context: { params: Promise<{ uuid: string }> }
+) {
+  const params = await context.params;
+  const uuid = params.uuid;
 
   // if client didn't send a uuid, but somehow got here
   if (!uuid) {
@@ -28,18 +32,18 @@ export async function GET(req: NextRequest, context): Promise<NextResponse> {
   }
 }
 
-// @ts-expect-error TypeScript’s strict route handler typing expects the second parameter to be a Promise-like type
-export async function PATCH(req: NextRequest, context): Promise<NextResponse> {
-  const { params } = context;
+export async function PATCH(
+  req: NextRequest,
+  context: { params: Promise<{ uuid: string }> }
+) {
+  const params = await context.params;
+  const uuid = params.uuid;
 
-  // update state of named UUID
-  if (!params || !params.uuid) {
+  if (!uuid) {
     return jsonError('UUID is required', 400);
   }
 
   try {
-    const { uuid } = params;
-
     const body = await req.json();
 
     const res = await fetch(`${BACKEND_URL}/${uuid}`, {

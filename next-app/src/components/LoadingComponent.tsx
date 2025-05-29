@@ -41,6 +41,7 @@ export const LoadingComponent = ({
     >
       <Image
         src="/wine.apng"
+        unoptimized
         alt="Loading - Animated icons by Lordicon.com"
         width={200}
         height={200}

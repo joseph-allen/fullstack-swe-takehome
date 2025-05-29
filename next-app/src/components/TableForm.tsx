@@ -88,6 +88,7 @@ const TableForm: React.FC<TableFormProps> = ({ onSubmit, isLoading }) => {
       {Array.from({ length: size }, (_, i) => (
         <Image
           key={i}
+          unoptimized
           src="/person.apng"
           alt={`Icon ${i + 1}`}
           width={64}
