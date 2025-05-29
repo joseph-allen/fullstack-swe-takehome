@@ -94,6 +94,16 @@ describe('useAppMachine hook', () => {
     expect(result.current.currentState).toBe('inQueue');
   });
 
+  it('jumps directly from idle → checkedIn on forceCheckedIn()', () => {
+    const { result } = renderHook(() => useAppMachine());
+
+    act(() => {
+      result.current.forceCheckedIn();
+    });
+
+    expect(result.current.currentState).toBe('checkedIn');
+  });
+
   it('transitions from readyToCheckIn → checkedIn on checkedIn()', () => {
     const { result } = renderHook(() => useAppMachine());
 
