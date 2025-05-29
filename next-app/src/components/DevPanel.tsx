@@ -71,6 +71,12 @@ export default function DevPanel({
   // Are we the next party?
   const isUserNextParty = joinedPartyID === nextPartyId;
 
+  // Handler to clear UUID and force page reload
+  const handleClearUUID = () => {
+    removeUUID();
+    window.location.reload();
+  };
+
   // Add a single random party
   const addRandomPartiesWithDelay = useCallback(
     async (count = 3) => {
@@ -196,7 +202,7 @@ export default function DevPanel({
                 <code>Your UUID:</code> <strong>{uuid}</strong>
               </Typography>
               <Button
-                onClick={removeUUID}
+                onClick={handleClearUUID}
                 size="small"
                 variant="outlined"
                 sx={{
