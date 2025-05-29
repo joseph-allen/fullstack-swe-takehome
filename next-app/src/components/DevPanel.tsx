@@ -1,7 +1,7 @@
 'use client';
 // This component is purely used to play around with the front-end
 // It's not tested, and doesn't update as frequently as it should do
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Drawer,
   Typography,
@@ -77,32 +77,49 @@ export default function DevPanel({
     window.location.reload();
   };
 
-  // Add a single random party
-  const addRandomPartiesWithDelay = useCallback(
-    async (count = 3) => {
-      const sizes = [2, 3, 4, 5, 6];
+  const addRandomParties = async () => {
+    const randomSizes = [2, 3];
+    const numberOfParties = 1;
 
-      for (let i = 0; i < count; i++) {
-        const size = sizes[Math.floor(Math.random() * sizes.length)];
-        const party = generateRandomParty(size);
+    // Wrap mutation.mutate in a Promise to await completion
+    const promises = [];
+    for (let i = 0; i < numberOfParties; i++) {
+      const size = randomSizes[Math.floor(Math.random() * randomSizes.length)];
+      const party = generateRandomParty(size);
 
-        try {
-          await new Promise<void>((resolve, reject) => {
-            mutation.mutate(party, {
-              onSuccess: () => resolve(),
-              onError: (error) => reject(error),
-            });
-          });
-          refetch?.(); // Refresh after each add
-          await new Promise((r) => setTimeout(r, 1000)); // 1 second delay
-        } catch (err) {
-          console.error('Error adding random party:', err);
-          break; // Optionally stop on error
-        }
+      const promise = new Promise<void>((resolve, reject) => {
+        mutation.mutate(party, {
+          onSuccess: () => resolve(),
+          onError: (error) => reject(error),
+        });
+      });
+      promises.push(promise);
+    }
+    await Promise.all(promises);
+
+    // After all mutations finish, refresh parties
+    if (refetch) {
+      refetch();
+    }
+  };
+
+  const fillQueue = () => {
+    let count = 0;
+    const queueSize = 3;
+
+    const intervalId = setInterval(async () => {
+      if (count >= queueSize) {
+        clearInterval(intervalId);
+        return;
       }
-    },
-    [mutation, refetch]
-  );
+      try {
+        await addRandomParties();
+      } catch (err) {
+        console.error('Error adding random parties:', err);
+      }
+      count++;
+    }, 1000);
+  };
 
   // Refetch parties whenever ping changes,
   // force queue to re-render when availible seats changes,
@@ -291,7 +308,7 @@ export default function DevPanel({
             color="success"
             size="small"
             sx={{ mt: 2, fontFamily: FONTS.monospace }}
-            onClick={() => addRandomPartiesWithDelay(3)}
+            onClick={fillQueue}
             disabled={mutation.status === 'pending'}
           >
             Fill Queue

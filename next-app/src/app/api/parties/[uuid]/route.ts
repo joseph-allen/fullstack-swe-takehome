@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { jsonError } from '@/helpers/apiHelpers';
 
-const BACKEND_URL = 'http://backend:4000/parties';
 export const dynamic = 'force-dynamic';
 
 export async function GET(
@@ -18,7 +17,7 @@ export async function GET(
 
   try {
     // make GET call
-    const res = await fetch(`${BACKEND_URL}/${uuid}`);
+    const res = await fetch(`http://backend:4000/parties/${uuid}`);
 
     if (!res.ok) {
       return jsonError('Party not found', 404);
@@ -46,7 +45,7 @@ export async function PATCH(
   try {
     const body = await req.json();
 
-    const res = await fetch(`${BACKEND_URL}/${uuid}`, {
+    const res = await fetch(`http://backend:4000/parties/${uuid}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),

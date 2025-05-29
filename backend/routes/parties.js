@@ -307,6 +307,7 @@ router.patch("/:uuid", async (req, res) => {
       });
     }
 
+    const systemColl = mongoose.connection.db.collection("system");
     const systemDoc = await systemColl.findOne({ _id: "singleton" });
 
     if (!systemDoc) {
@@ -350,7 +351,7 @@ router.patch("/:uuid", async (req, res) => {
       success: true,
       message: `Party status updated to ${newStatus}`,
     });
-  } catch (err) {
+  } catch (error) {
     return handleError(res, "Failed to patch a party", error);
   }
 });

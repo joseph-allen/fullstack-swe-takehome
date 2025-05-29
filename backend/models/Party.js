@@ -12,7 +12,7 @@ const partySchema = new mongoose.Schema({
     enum: ["waiting", "seated", "done"],
     default: "waiting",
   },
-  simulatedParty: { type: String, default: false },
+  simulatedParty: { type: Boolean, default: false },
 });
 
 module.exports = mongoose.model("Party", partySchema);

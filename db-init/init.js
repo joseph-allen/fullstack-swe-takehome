@@ -14,7 +14,7 @@ async function getNextPartyID(db) {
       { $inc: { seq: 1 } },
       { upsert: true, returnDocument: "after" }
     );
-  return String(result.value.seq).padStart(3, "0");
+  return String(result.seq).padStart(3, "0");
 }
 
 async function prepareCollections(db) {
