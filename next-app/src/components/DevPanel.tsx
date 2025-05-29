@@ -1,6 +1,7 @@
 'use client';
-
-import { useState, useEffect } from 'react';
+// This component is purely used to play around with the front-end
+// It's not tested, and doesn't update as frequently as it should do
+import { useState, useEffect, useCallback } from 'react';
 import {
   Drawer,
   Typography,
@@ -16,6 +17,20 @@ import renderSeats from '@/helpers/renderSeats';
 import { usePartiesWithStatus } from '@/hooks/usePartiesWithStatus';
 import { generateRandomParty } from '@/helpers/generateRandomParty';
 import { useJoinQueueMutation } from '@/hooks/useJoinQueueMutation';
+
+// Extracted font and color variables
+const COLORS = {
+  brightGreen: '#00FF00',
+  darkGreen: '#00CC00',
+  backgroundBlack: '#000',
+  borderGreen: '#004400',
+  textBlack: '#000',
+  error: 'error', // MUI color keyword
+};
+
+const FONTS = {
+  monospace: 'Courier New, monospace',
+};
 
 type DevPanelProps = {
   joinedPartyID: string;
@@ -39,69 +54,82 @@ export default function DevPanel({
   const { uuid, removeUUID } = useUUID();
   const { data, error, isLoading } = usePingDB();
   const { parties: waitingParties, refetch } = usePartiesWithStatus('waiting');
+  const mutation = useJoinQueueMutation(() => {
+    // does nothing
+  });
 
   const [open, setOpen] = useState(false);
 
+  // We can seat a party if availible seats,
+  // and next party size is defined(it won't be if the resturant is empty)
+  // If there is space for the next party, they can be seated
   const canSeatNextParty =
     availableSeats !== null &&
     nextPartySize !== null &&
     availableSeats >= nextPartySize;
 
+  // Are we the next party?
   const isUserNextParty = joinedPartyID === nextPartyId;
 
-  const mutation = useJoinQueueMutation(() => {
-    // I don't need any state to be updated for dev purposes.
-    // pass
-  });
+  // Add a single random party
+  const addRandomPartiesWithDelay = useCallback(
+    async (count = 3) => {
+      const sizes = [2, 3, 4, 5, 6];
 
-  const addRandomParties = async () => {
-    const randomSizes = [2, 3, 4, 5, 6];
-    const numberOfParties = 1;
+      for (let i = 0; i < count; i++) {
+        const size = sizes[Math.floor(Math.random() * sizes.length)];
+        const party = generateRandomParty(size);
 
-    // Wrap mutation.mutate in a Promise to await completion
-    const promises = [];
-    for (let i = 0; i < numberOfParties; i++) {
-      const size = randomSizes[Math.floor(Math.random() * randomSizes.length)];
-      const party = generateRandomParty(size);
+        try {
+          await new Promise<void>((resolve, reject) => {
+            mutation.mutate(party, {
+              onSuccess: () => resolve(),
+              onError: (error) => reject(error),
+            });
+          });
+          refetch?.(); // Refresh after each add
+          await new Promise((r) => setTimeout(r, 1000)); // 1 second delay
+        } catch (err) {
+          console.error('Error adding random party:', err);
+          break; // Optionally stop on error
+        }
+      }
+    },
+    [mutation, refetch]
+  );
 
-      const promise = new Promise<void>((resolve, reject) => {
-        mutation.mutate(party, {
-          onSuccess: () => resolve(),
-          onError: (error) => reject(error),
-        });
-      });
-      promises.push(promise);
-    }
-    await Promise.all(promises);
-
-    // After all mutations finish, refresh parties
-    if (refetch) {
-      refetch();
-    }
-  };
-
+  // Refetch parties whenever ping changes,
+  // force queue to re-render when availible seats changes,
+  // force re-render when user enters queue
   useEffect(() => {
-    if (refetch) {
-      refetch();
+    refetch?.();
+  }, [data?.ping, availableSeats, customerSize, refetch]);
+
+  // Render party queue list
+  const renderPartyQueue = () => {
+    if (waitingParties.length === 0) {
+      return <Typography>(No parties waiting)</Typography>;
     }
-  }, [data?.ping, refetch]);
-
-  const fillQueue = () => {
-    let count = 0;
-    const queueSize = 10;
-
-    const intervalId = setInterval(async () => {
-      if (count >= queueSize) {
-        clearInterval(intervalId);
-        return;
-      }
-      try {
-        await addRandomParties();
-      } catch (err) {
-        console.error('Error adding random parties:', err);
-      }
-      count++;
-    }, 1000);
+    return waitingParties.map((party) => {
+      const isYourParty = party.partyID === joinedPartyID;
+      return (
+        <Box
+          key={party.uuid}
+          display="flex"
+          alignItems="center"
+          gap={1}
+          mt={0.5}
+          component="div"
+        >
+          <Typography>{party.partyID}</Typography>
+          <span>
+            {isYourParty
+              ? '🟢'.repeat(party.size) + '(You)'
+              : '🟩'.repeat(party.size)}
+          </span>
+        </Box>
+      );
+    });
   };
 
   return (
@@ -114,12 +142,11 @@ export default function DevPanel({
             position: 'fixed',
             top: 16,
             left: 16,
-            bgcolor: '#00FF00',
-            color: '#000',
-            fontFamily: 'Courier New, monospace',
-            zIndex: 1300,
+            bgcolor: COLORS.brightGreen,
+            color: COLORS.textBlack,
+            fontFamily: FONTS.monospace,
             '&:hover': {
-              bgcolor: '#00CC00',
+              bgcolor: COLORS.darkGreen,
             },
           }}
           onClick={() => setOpen(true)}
@@ -135,10 +162,9 @@ export default function DevPanel({
         slotProps={{
           paper: {
             sx: {
-              bgcolor: '#000',
-              color: '#00FF00',
-              fontFamily: 'Courier New, monospace',
-              width: 320,
+              bgcolor: COLORS.backgroundBlack,
+              color: COLORS.brightGreen,
+              fontFamily: FONTS.monospace,
             },
           },
         }}
@@ -149,17 +175,17 @@ export default function DevPanel({
           alignItems="center"
           px={2}
           py={1}
-          borderBottom="1px solid #004400"
+          borderBottom={`1px solid ${COLORS.borderGreen}`}
         >
           <IconButton
             onClick={() => setOpen(false)}
             size="small"
-            sx={{ color: '#00FF00' }}
+            sx={{ color: COLORS.brightGreen }}
           >
             <CloseIcon />
           </IconButton>
         </Box>
-        <Divider sx={{ borderColor: '#004400' }} />
+        <Divider sx={{ borderColor: COLORS.borderGreen }} />
 
         <Box px={2} mt={1}>
           {!uuid ? (
@@ -174,9 +200,9 @@ export default function DevPanel({
                 size="small"
                 variant="outlined"
                 sx={{
-                  color: '#00FF00',
-                  borderColor: '#00FF00',
-                  fontFamily: 'Courier New, monospace',
+                  color: COLORS.brightGreen,
+                  borderColor: COLORS.brightGreen,
+                  fontFamily: FONTS.monospace,
                 }}
               >
                 Clear UUID
@@ -191,7 +217,7 @@ export default function DevPanel({
           )}
 
           {error && (
-            <Typography color="error" mt={2}>
+            <Typography color={COLORS.error} mt={2}>
               Backend error: <code>{(error as Error).message}</code>
             </Typography>
           )}
@@ -235,38 +261,17 @@ export default function DevPanel({
                 </Typography>
               </Box>
 
-              <Box mt={1} fontSize={20} fontFamily="Courier New, monospace">
+              <Box mt={1} fontSize={20} fontFamily={FONTS.monospace}>
                 Seats: <br />
                 {renderSeats(totalSeats, availableSeats ?? 0, 0)}
               </Box>
             </Box>
           )}
 
-          {/* Queue viz */}
-          <Box mt={2} fontFamily="Courier New, monospace" fontSize={16}>
+          {/* Queue visualization */}
+          <Box mt={2} fontFamily={FONTS.monospace} fontSize={16}>
             <Typography>Queue (waiting parties):</Typography>
-            {waitingParties.length === 0 && (
-              <Typography>(No parties waiting)</Typography>
-            )}
-            {waitingParties.map((party) => {
-              const isYourParty = party.partyID === joinedPartyID;
-              return (
-                <Box
-                  key={party.uuid}
-                  display="flex"
-                  alignItems="center"
-                  gap={1}
-                  mt={0.5}
-                >
-                  <Typography>{party.partyID}</Typography>
-                  <span>
-                    {isYourParty
-                      ? '🟢'.repeat(party.size) + '(You)'
-                      : '🟩'.repeat(party.size)}
-                  </span>
-                </Box>
-              );
-            })}
+            {renderPartyQueue()}
           </Box>
 
           {joinedPartyID && (
@@ -279,15 +284,15 @@ export default function DevPanel({
             variant="contained"
             color="success"
             size="small"
-            sx={{ mt: 2, fontFamily: 'Courier New, monospace' }}
-            onClick={fillQueue}
+            sx={{ mt: 2, fontFamily: FONTS.monospace }}
+            onClick={() => addRandomPartiesWithDelay(3)}
             disabled={mutation.status === 'pending'}
           >
             Fill Queue
           </Button>
 
           {patchError && (
-            <Typography color="error" mt={2}>
+            <Typography color={COLORS.error} mt={2}>
               Patch Error: <code>{String(patchError)}</code>
             </Typography>
           )}
