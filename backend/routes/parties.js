@@ -5,6 +5,11 @@ const Party = require("../models/Party");
 const getNextPartyID = require("../helpers/getNextPartyID");
 const updateSystemState = require("../lib/systemState");
 
+function handleError(res, message, error, status = 500) {
+  console.error(message, error);
+  return res.status(status).json({ error: message });
+}
+
 /**
  * @swagger
  * tags:
@@ -49,8 +54,7 @@ router.get("/", async (req, res) => {
     console.log("Found parties:", parties.length);
     res.status(200).json(parties);
   } catch (error) {
-    console.error("Error fetching parties:", error);
-    res.status(500).json({ error: "Failed to fetch parties" });
+    return handleError(res, "Failed to fetch parties", error);
   }
 });
 
@@ -98,8 +102,7 @@ router.get("/:uuid", async (req, res) => {
     }
     res.status(200).json(party);
   } catch (error) {
-    console.error("Error fetching party:", error);
-    res.status(500).json({ error: "Failed to fetch party" });
+    return handleError(res, "Failed to fetch parties", error);
   }
 });
 
@@ -192,8 +195,7 @@ router.post("/", async (req, res) => {
 
     res.status(201).json({ message: "Party created", id: savedParty.partyID });
   } catch (error) {
-    console.error("Error inserting party:", error);
-    res.status(500).json({ error: "Failed to insert party" });
+    return handleError(res, "Failed to insert a party", error);
   }
 });
 
@@ -286,6 +288,8 @@ router.patch("/:uuid", async (req, res) => {
     }
 
     const currentStatus = party.status;
+    const isWaiting = currentStatus === "waiting";
+    const isSeated = currentStatus === "seated";
 
     // Valid transitions
     // waiting -> seated - joining queue
@@ -293,9 +297,9 @@ router.patch("/:uuid", async (req, res) => {
     // waiting -> done - abandoned, or removed from queue
     if (
       !(
-        (currentStatus === "waiting" && newStatus === "seated") ||
-        (currentStatus === "seated" && newStatus === "done") ||
-        (currentStatus === "waiting" && newStatus === "done")
+        (isWaiting && newStatus === "seated") ||
+        (isSeated && newStatus === "done") ||
+        (isWaiting && newStatus === "done")
       )
     ) {
       return res.status(400).json({
@@ -303,14 +307,13 @@ router.patch("/:uuid", async (req, res) => {
       });
     }
 
-    const systemColl = mongoose.connection.db.collection("system");
     const systemDoc = await systemColl.findOne({ _id: "singleton" });
 
     if (!systemDoc) {
       return res.status(500).json({ error: "System configuration missing" });
     }
 
-    if (currentStatus === "waiting" && newStatus === "seated") {
+    if (isWaiting && newStatus === "seated") {
       if (systemDoc.availableSeats < party.size) {
         return res.status(400).json({ error: "Not enough seats available" });
       }
@@ -326,7 +329,7 @@ router.patch("/:uuid", async (req, res) => {
         { _id: "singleton" },
         { $inc: { availableSeats: -party.size } }
       );
-    } else if (currentStatus === "seated" && newStatus === "done") {
+    } else if (isSeated && newStatus === "done") {
       // Update party status to done
       await Party.updateOne(
         { uuid, status: currentStatus },
@@ -348,8 +351,7 @@ router.patch("/:uuid", async (req, res) => {
       message: `Party status updated to ${newStatus}`,
     });
   } catch (err) {
-    console.error("Error updating party status:", err);
-    return res.status(500).json({ error: "Failed to update party status" });
+    return handleError(res, "Failed to patch a party", error);
   }
 });
 

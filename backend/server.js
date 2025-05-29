@@ -8,15 +8,9 @@ app.use(express.json());
 
 setupSwagger(app); // apply swagger middleware
 
-app.get("/", (req, res) => {
-  res.send("Hello from Express backend!");
-});
-
-app.use("/parties", partyRoutes);
-
+// ping to get data on interval
 app.get("/ping-db", async (req, res) => {
   try {
-    // ping to check alive
     const db = req.app.locals.db;
     if (!db) throw new Error("Database not connected yet");
 
@@ -25,9 +19,11 @@ app.get("/ping-db", async (req, res) => {
 
     res.json({ status: "MongoDB is alive", system: systemData });
   } catch (error) {
-    console.error(error);
+    console.error("[/ping-db] Failed to retrieve system data:", error);
     res.status(500).json({ error: "Failed to retrieve system data" });
   }
 });
+
+app.use("/parties", partyRoutes);
 
 module.exports = app;

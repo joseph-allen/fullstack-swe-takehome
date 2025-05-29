@@ -119,7 +119,7 @@ describe("Parties routes", () => {
       const response = await request(app).post("/parties").send(party);
 
       expect(response.statusCode).toBe(500);
-      expect(response.body).toEqual({ error: "Failed to insert party" });
+      expect(response.body).toEqual({ error: "Failed to insert a party" });
     });
 
     afterAll(() => {
