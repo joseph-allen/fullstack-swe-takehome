@@ -81,7 +81,7 @@ export default function HomePage() {
         forceCheckedIn();
       }
     }
-  }, [party, partyLoading, partyError, forceInQueue, reset]);
+  }, [party, partyLoading, partyError, forceInQueue, forceCheckedIn, reset]);
 
   // Move all values from System into state if pingData changes
   useEffect(() => {
