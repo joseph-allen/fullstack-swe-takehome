@@ -79,6 +79,7 @@ export default function HomePage() {
     }
   }, [party, partyLoading, partyError, forceInQueue, reset]);
 
+  // Move all values from System into state if pingData changes
   useEffect(() => {
     if (pingData?.system?.[0]) {
       const system = pingData.system[0];
@@ -96,11 +97,13 @@ export default function HomePage() {
     }
   }, [current, isInQueue, joinedPartyID, nextPartyId, readyToCheckIn]);
 
+  // handler for custom mutation hook
   const mutation = useJoinQueueMutation((data) => {
     setJoinedPartyID(data.id);
     queueJoined();
   });
 
+  // handle submit form button, but change state here
   const handleFormSubmit = (data: { name: string; size: number }) => {
     const payload = {
       uuid,
@@ -114,13 +117,23 @@ export default function HomePage() {
     mutation.mutate(payload);
   };
 
+  // handle buttons which update this parties state
   const handleStatusUpdate = (status: 'seated' | 'done') => {
     if (uuid) updatePartyStatus(uuid, status);
     checkedIn();
   };
 
+  // handle premature queue leaving
+  const handleLeaveQueue = () => {
+    handleStatusUpdate('done');
+    leaveQueue();
+    removeUUID();
+    resetUUID();
+  };
+
   return (
     <>
+      {/* Optional dev panel */}
       <DevPanel
         joinedPartyID={joinedPartyID}
         patchError={patchError}
@@ -131,6 +144,7 @@ export default function HomePage() {
         customerSize={customerSize}
       />
 
+      {/* If user is in queue, or ready to check in we should display status */}
       {(isInQueue || isReadyToCheckIn) && (
         <StatusComponent
           state={current}
@@ -141,6 +155,7 @@ export default function HomePage() {
         />
       )}
 
+      {/* If ready to check in, but not yet seated */}
       {isReadyToCheckIn && uuid && party?.status !== 'seated' && (
         <Button
           variant="outlined"
@@ -153,6 +168,7 @@ export default function HomePage() {
 
       {current == 'inQueue' && <Divider flexItem sx={{ my: 4 }} />}
 
+      {/* bottom half of page */}
       <Box
         display="flex"
         flexDirection="column"
@@ -181,21 +197,16 @@ export default function HomePage() {
           />
         )}
 
-        {/* TODO: Change state when partyID matches NextPartyID  */}
         {isInQueue && (
           <>
             <LoadingComponent text="Waiting" withDots />
             <Box display="flex" gap={4} alignItems="center">
               <Typography variant="h5">Change your mind?</Typography>
+              {/* Option to leave queue */}
               <Button
                 variant="outlined"
                 color="warning"
-                onClick={() => {
-                  handleStatusUpdate('done');
-                  leaveQueue();
-                  removeUUID();
-                  resetUUID();
-                }}
+                onClick={handleLeaveQueue}
               >
                 Leave Queue
               </Button>
@@ -203,6 +214,7 @@ export default function HomePage() {
           </>
         )}
 
+        {/* celebration confetti */}
         {isReadyToCheckIn && (
           <Confetti
             particleCount={80}
@@ -214,6 +226,7 @@ export default function HomePage() {
           />
         )}
 
+        {/* Final state - thank you */}
         {isCheckedIn && (
           <>
             <Typography variant="h3" component="p">
