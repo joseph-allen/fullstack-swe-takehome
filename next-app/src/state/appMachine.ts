@@ -8,6 +8,7 @@ export const appMachine = createMachine({
       on: {
         JOIN_CLICKED: 'showForm',
         FORCE_INQUEUE: 'inQueue',
+        FORCE_CHECKED_IN: 'checkedIn',
       },
     },
     showForm: {

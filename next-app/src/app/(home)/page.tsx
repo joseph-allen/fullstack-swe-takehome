@@ -33,6 +33,7 @@ export default function HomePage() {
     checkedIn,
     reset,
     forceInQueue,
+    forceCheckedIn,
   } = useAppMachine();
   const current = currentState as AppState;
 
@@ -75,6 +76,9 @@ export default function HomePage() {
       if (party.status === 'waiting') {
         forceInQueue();
         setJoinedPartyID(party.partyID);
+      } else if (party.status === 'seated' || 'done') {
+        // route to cheked in?
+        forceCheckedIn();
       }
     }
   }, [party, partyLoading, partyError, forceInQueue, reset]);
