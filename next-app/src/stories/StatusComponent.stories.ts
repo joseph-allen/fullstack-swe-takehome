@@ -17,7 +17,13 @@ const meta = {
   argTypes: {
     state: {
       control: { type: 'select' },
-      options: ['idle', 'in queue', 'ready to check in'],
+      options: [
+        'idle',
+        'showForm',
+        'formSubmitted',
+        'inQueue',
+        'readyToCheckIn',
+      ],
       defaultValue: 'idle',
       description:
         'The current state of the reservation or queue. Can be "idle", "in queue", or "ready to check in".',
