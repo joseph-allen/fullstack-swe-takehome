@@ -1,29 +1,44 @@
 # Remote Waitlist Manager
 
-<!-- TODO: tidy up this header, summary and add GIF of flow and architecture -->
+A full-stack application to manage restaurant waitlists, with real-time seating, queuing, and notifications for diners. Takehome task for TableCheck.
 ![Queue](https://github.com/user-attachments/assets/a69f69e4-394f-46ee-8a2f-c4ef07996852)
 
-Node Version - v22.15.0
-
-- [Project Board](https://github.com/users/joseph-allen/projects/2)
-- [Live URL](https://fullstack-swe-takehome.vercel.app/)
-- [API Endpoint](https://fullstack-swe-takehome.vercel.app/api/test)
-- [Storybook](https://6823193a638044cca3f86e60-dqlkgbwbev.chromatic.com/)
-- [Local Swagger Deploy](http://localhost:4000/api-docs/)
-
-A full-stack application to manage restaurant waitlists, with real-time seating, queuing, and notifications for diners. Takehome task for TableCheck.
-
-# Table of Contents
+## Table of Contents
 
 1. [Setup](#setup)
 2. [Diary](#diary)
 
-# Setup
+## Things to look at
+
+### Publicly
+
+anyone can look at the:
+
+- [Project Board](https://github.com/users/joseph-allen/projects/2)
+- [Storybook](https://6823193a638044cca3f86e60-pnymrvnegx.chromatic.com/)
+
+### Locally
+
+Once you have the App running locally, as described below, you can explore the following:
+
+- [The App](http://localhost:3000/)
+- [The Backend](http://localhost:4000/)
+- [The Swagger Documentation](http://localhost:4000/api-docs/)
+
+## Setup
 
 ### Quick run with Docker
 
+The appliation should run with a single
+
 ```
 docker compose up
+```
+
+To re-initialise the database in various states, you will need to rebuild with
+
+```
+docker compose up --build
 ```
 
 You may need to build for Windows devices first
@@ -34,10 +49,13 @@ DOCKER_BUILDKIT=1 docker compose build --no-cache
 
 ### Mongo
 
-Shell with mongo-shell
-`mongosh mongodb://root:example@localhost:27017`
+You may explore the MongoDB with
 
-Then run:
+```
+mongosh mongodb://root:example@localhost:27017
+```
+
+And running some useful commands:
 
 ```
 use my-db
@@ -45,54 +63,6 @@ show collections
 db.parties.find().pretty()
 db.system.find().pretty()
 ```
-
-### Running locally
-
-If you've never run a Next app locally before, this more verbose guide is for you.
-
-#### 1. Install Node.js (via NVM)
-
-We use [`nvm`](https://github.com/nvm-sh/nvm) to manage Node.js versions.
-
-##### a. Install `nvm` (macOS/Linux):
-
-```bash
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-```
-
-Then restart your terminal.
-
-##### b. Install `nvm` (macOS/Linux):
-
-This project includes an .nvmrc file, so you can run the following to set your version in this folder.
-
-```bash
-nvm install
-nvm use
-```
-
-#### 2. Set Editor settings for VSCode
-
-```
-{
-  "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
-  }
-}
-```
-
-### Quick setup
-
-For a user who already has this all setup, you have access to the usual npm commands:
-
-- npm install
-- npm run dev
-- npm run build
-- npm run start
-- npm run test
-- npm run lint
 
 ### Storybook
 
@@ -102,19 +72,45 @@ Open Storybook locally with:
 npm run storybook
 ```
 
-We can also deploy Storybook to Chromatic with
-
-```bash
-npx chromatic --project-token=chpt_b609d47135590e0
-```
-
 # Diary
 
-1. [Initial thoughts](#initial-thoughts)
-2. [Project Setup](#project-setup)
-3. [Solution](#solution)
+1. [Summary](#summary)
+2. [Initial thoughts](#initial-thoughts)
+3. [Project Setup](#project-setup)
+4. [Solution](#solution)
 
-## Initial thoughts
+### Summary
+
+I'm writing this, at the end of the project.
+
+With the tech task now wrapping up, I just wanted to briefly thank you for something more fun and broader in scope than the usual tech task. I usually at least work with another backend developer that takes on a lot of the responsbility in a project like this.
+
+My solution, generally follows this structure:
+
+1. A user arrives at the resturant, and scans a QR code
+2. The user is shown an estimate of the current queue size, and decides to join the queue.
+3. The user fills in our form, and the database stores a UUID and friendly PartyID
+4. The system calculates the nextPartyID to be seated, and the number of seats availible every time the resturant state changes.
+5. All users regularly poll this system state, checking if they are next, if there is space. If there isn't space, an estimate is made.
+6. If there is space, and the partyID matches the user is offered a chance to check in.
+7. The user shows their success screen to the resturant, and checks in.
+
+<!-- TODO: Add architecture diagram here -->
+
+I added a lot of developer options to simulate diners for testing, which was out of scope but the most fun. You can open this clicking the Dev Panel button in the top-left of the app.
+
+Given more time I'd explore the following:
+
+- Formalise styling more - I spent a lot of time setting up emotion for SSR at the start which I never used.
+- Resturant CRM - With more formalised theming adding seperate branded headers, footers and more could have been a simple request to my database.
+- Queue estimation - estimates are currently 5 minutes(3 seconds) per diner, but storing the entire tablestate I could have added an object to the System collection which would let the front-end calculate their own estimate.
+- Better seating - There are situation where sitting multiple tables at once is viable.
+- Better queue representation - Part of me feels that the MongoDB was not relevant, and could have been replaced with some sort of SQS with the front-ends being subscribers.
+- Better notifications - I spent a while looking at server-sent events and WebSockets. I know there is a better solution here but by the time I got around to the backend I'd spent too much time on this.
+
+The diary is in development order.
+
+### Initial thoughts
 
 Having read multiple blog posts from the TableCheck tech blog, I stumbled upon [the fullstack tech test](https://github.com/TableCheck-Labs/fullstack-swe-takehome). My intial thoughts are that this is highly technical, and I haven't done a take home task in a while. Despite that, I like a structured oppurtunity to learn and don't have a recent tech test up so regardless of the outcome, this looks like a good use of my time.
 
