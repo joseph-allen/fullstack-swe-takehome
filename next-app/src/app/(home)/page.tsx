@@ -60,7 +60,6 @@ export default function HomePage() {
   // helper booleans
   const isIdle = current === 'idle';
   const isShowForm = current === 'showForm';
-  const isFormSubmitted = current === 'formSubmitted';
   const isInQueue = current === 'inQueue';
   const isReadyToCheckIn = current === 'readyToCheckIn';
   const isCheckedIn = current === 'checkedIn';
@@ -135,27 +134,6 @@ export default function HomePage() {
         nextPartySize={nextPartySize}
         customerSize={customerSize}
       />
-
-      {isFormSubmitted && (
-        <Box textAlign="center">
-          <LoadingComponent text="Joining Queue" withDots />
-          <Button
-            variant="contained"
-            size="small"
-            sx={{
-              bgcolor: '#00FF00',
-              color: '#000',
-              fontFamily: 'Courier New, monospace',
-              '&:hover': {
-                bgcolor: '#00CC00',
-              },
-            }}
-            onClick={queueJoined}
-          >
-            Skip wait
-          </Button>
-        </Box>
-      )}
 
       {(isInQueue || isReadyToCheckIn) && (
         <StatusComponent
